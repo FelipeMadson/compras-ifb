@@ -1,0 +1,26 @@
+# Arquivos de compilação e dependências do Dart / Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+coverage/
+
+# Android
+android/**/gradle-wrapper.jar
+android/.gradle
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/**/GeneratedPluginRegistrant.java
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Diversos e SO
+.DS_Store
+Thumbs.db
+*.log
