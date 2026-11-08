@@ -156,7 +156,7 @@ class _CabecalhoResumo extends StatelessWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(
           side: BorderSide(color: cores.outlineVariant),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
         ),
         color: cores.surfaceContainerLow,
         child: Padding(
@@ -167,12 +167,38 @@ class _CabecalhoResumo extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Progresso das Compras',
-                    style: textos.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: cores.onSurface,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        'Progresso das Compras',
+                        style: textos.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: cores.onSurface,
+                          letterSpacing: -0.01,
+                        ),
+                      ),
+                      if (resumo.concluido && resumo.total > 0) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: cores.primary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Text(
+                            '100% concluído',
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w600,
+                              color: cores.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   Text(
                     '${resumo.comprados} de ${resumo.total} itens',
@@ -183,7 +209,7 @@ class _CabecalhoResumo extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: TweenAnimationBuilder<double>(
@@ -230,25 +256,47 @@ class _EstadoVazio extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
+    final cores = tema.colorScheme;
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.shopping_basket_outlined,
-              size: 64,
-              color: tema.colorScheme.outline,
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: cores.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: cores.outlineVariant),
+              ),
+              child: Icon(
+                Icons.shopping_basket_outlined,
+                size: 48,
+                color: cores.outline,
+              ),
             ),
-            const SizedBox(height: 16),
-            Text('Nenhum item na lista', style: tema.textTheme.titleMedium),
-            const SizedBox(height: 8),
+            const SizedBox(height: 20),
             Text(
-              'Toque em "Novo item" para iniciar o registro de compras.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: tema.colorScheme.onSurfaceVariant),
+              'Nenhum item na lista',
+              style: tema.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.01,
+              ),
+            ),
+            const SizedBox(height: 6),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 280),
+              child: Text(
+                'Toque em "Novo item" para iniciar o registro de compras.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: cores.onSurfaceVariant,
+                  fontSize: 13.5,
+                  height: 1.4,
+                ),
+              ),
             ),
           ],
         ),

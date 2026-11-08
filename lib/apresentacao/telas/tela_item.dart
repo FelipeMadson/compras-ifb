@@ -148,7 +148,9 @@ class _FormularioItemState extends ConsumerState<FormularioItem> {
 
   @override
   Widget build(BuildContext context) {
-    final textos = Theme.of(context).textTheme;
+    final tema = Theme.of(context);
+    final textos = tema.textTheme;
+    final cores = tema.colorScheme;
     final categorias = {...Identidade.categorias, _categoria}.toList();
 
     return PopScope(
@@ -161,7 +163,23 @@ class _FormularioItemState extends ConsumerState<FormularioItem> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: Text(_editando ? 'Editar item' : 'Novo item')),
+        appBar: AppBar(
+          title: Text(_editando ? 'Editar item' : 'Novo item'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            tooltip: 'Voltar',
+            onPressed: () async {
+              if (!_alterado) {
+                context.pop();
+                return;
+              }
+              final descartar = await _confirmarDescarte();
+              if (descartar && context.mounted) {
+                context.pop();
+              }
+            },
+          ),
+        ),
         body: SafeArea(
           top: false,
           child: Center(
@@ -171,8 +189,9 @@ class _FormularioItemState extends ConsumerState<FormularioItem> {
                 key: _chaveDoFormulario,
                 onChanged: _marcarAlterado,
                 child: ListView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                   children: [
+                    // Campo Nome do Item
                     TextFormField(
                       controller: _nome,
                       autofocus: !_editando,
@@ -180,19 +199,21 @@ class _FormularioItemState extends ConsumerState<FormularioItem> {
                       maxLength: tamanhoMaximoNome,
                       decoration: const InputDecoration(
                         labelText: 'Nome do item',
-                        border: OutlineInputBorder(),
+                        hintText: 'Ex.: Leite desnatado, Pão integral...',
                         prefixIcon: Icon(Icons.edit_outlined),
                       ),
                       validator: (valor) => validarNome(valor ?? ''),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
+                    // Campo Categoria
                     DropdownButtonFormField<String>(
                       initialValue: _categoria,
                       decoration: const InputDecoration(
                         labelText: 'Categoria',
-                        border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.category_outlined),
                       ),
+                      dropdownColor: cores.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(12),
                       items: [
                         for (final categoria in categorias)
                           DropdownMenuItem(
@@ -207,68 +228,139 @@ class _FormularioItemState extends ConsumerState<FormularioItem> {
                         }
                       },
                     ),
-                    const SizedBox(height: 24),
-                    Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.outlineVariant,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 20),
+                    // Seletor Estilizado de Quantidade (Padrão Apple HIG Stepper)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
+                      decoration: BoxDecoration(
+                        color: cores.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: cores.outlineVariant,
+                          width: 1,
                         ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text('Quantidade', style: textos.titleMedium),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Quantidade',
+                                  style: textos.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: -0.01,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Unidades a adquirir',
+                                  style: textos.bodySmall?.copyWith(
+                                    color: cores.outline,
+                                  ),
+                                ),
+                              ],
                             ),
-                            IconButton.outlined(
-                              tooltip: 'Diminuir quantidade',
-                              onPressed: _quantidade > quantidadeMinima
+                          ),
+                          // Botão Diminuir
+                          Material(
+                            color: cores.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(10),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: _quantidade > quantidadeMinima
                                   ? () => _mudarQuantidade(-1)
                                   : null,
-                              icon: const Icon(Icons.remove),
-                            ),
-                            ConstrainedBox(
-                              constraints: const BoxConstraints(minWidth: 56),
-                              child: Text(
-                                '$_quantidade',
-                                textAlign: TextAlign.center,
-                                style: textos.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
+                              child: Container(
+                                width: 38,
+                                height: 38,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: cores.outlineVariant.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                                child: Icon(
+                                  Icons.remove,
+                                  size: 18,
+                                  color: _quantidade > quantidadeMinima
+                                      ? cores.onSurface
+                                      : cores.outline.withValues(alpha: 0.4),
                                 ),
                               ),
                             ),
-                            IconButton.outlined(
-                              tooltip: 'Aumentar quantidade',
-                              onPressed: _quantidade < quantidadeMaxima
+                          ),
+                          // Valor Numérico
+                          Container(
+                            constraints: const BoxConstraints(minWidth: 50),
+                            alignment: Alignment.center,
+                            child: Text(
+                              '$_quantidade',
+                              style: textos.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 17,
+                              ),
+                            ),
+                          ),
+                          // Botão Aumentar
+                          Material(
+                            color: cores.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(10),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: _quantidade < quantidadeMaxima
                                   ? () => _mudarQuantidade(1)
                                   : null,
-                              icon: const Icon(Icons.add),
+                              child: Container(
+                                width: 38,
+                                height: 38,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: cores.outlineVariant.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                                child: Icon(
+                                  Icons.add,
+                                  size: 18,
+                                  color: _quantidade < quantidadeMaxima
+                                      ? cores.onSurface
+                                      : cores.outline.withValues(alpha: 0.4),
+                                ),
+                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 20),
+                    // Campo Observação
                     TextFormField(
                       controller: _observacao,
                       minLines: 2,
                       maxLines: 4,
                       decoration: const InputDecoration(
-                        labelText: 'Observações adicionais (opcional)',
+                        labelText: 'Observação (opcional)',
                         hintText: 'Marca de preferência, tamanho, peso, embalagem...',
-                        border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.notes_outlined),
                       ),
                     ),
                     const SizedBox(height: 32),
+                    // Botão Principal de Submissão
                     FilledButton.icon(
                       onPressed: _salvando ? null : _salvar,
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                       icon: _salvando
                           ? const SizedBox.square(
                               dimension: 18,
@@ -277,9 +369,13 @@ class _FormularioItemState extends ConsumerState<FormularioItem> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Icon(Icons.check),
+                          : const Icon(Icons.check, size: 20),
                       label: Text(
                         _editando ? 'Salvar alterações' : 'Adicionar à lista',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],

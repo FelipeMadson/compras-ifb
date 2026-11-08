@@ -24,147 +24,267 @@ class TelaSobre extends ConsumerWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
             child: ListView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: cores.primaryContainer,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Icon(
-                        Icons.shopping_cart_checkout,
-                        size: 32,
-                        color: cores.onPrimaryContainer,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(Identidade.nomeDoApp, style: textos.titleLarge),
-                          Text(
-                            'Versão 1.0.0 (Build 1)',
-                            style: textos.bodySmall?.copyWith(color: cores.outline),
+                // Cartão de Cabeçalho do App
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: cores.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: cores.outlineVariant),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: cores.primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: cores.primary.withValues(alpha: 0.25),
                           ),
-                        ],
+                        ),
+                        child: Icon(
+                          Icons.shopping_bag_outlined,
+                          size: 32,
+                          color: cores.primary,
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              Identidade.nomeDoApp,
+                              style: textos.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.02,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: cores.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: cores.outlineVariant.withValues(alpha: 0.6),
+                                ),
+                              ),
+                              child: Text(
+                                'Versão 1.0.0 · Build 1 · DPDMV 2026/2',
+                                style: textos.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 11,
+                                  color: cores.outline,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   Identidade.descricao,
-                  style: textos.bodyMedium?.copyWith(color: cores.onSurfaceVariant),
+                  style: textos.bodyMedium?.copyWith(
+                    color: cores.onSurfaceVariant,
+                    height: 1.45,
+                  ),
                 ),
                 const Divider(height: 36),
+                // Seção Autoria Acadêmica
                 Text(
                   'Autoria e Vínculo Institucional',
-                  style: textos.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                for (final integrante in Identidade.integrantes)
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: CircleAvatar(
-                      backgroundColor: cores.secondaryContainer,
-                      child: Icon(Icons.person, color: cores.onSecondaryContainer),
-                    ),
-                    title: Text(integrante.nome, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    subtitle: Text('Matrícula institucional: ${integrante.matricula}'),
+                  style: textos.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.01,
                   ),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: CircleAvatar(
-                    backgroundColor: cores.secondaryContainer,
-                    child: Icon(Icons.school, color: cores.onSecondaryContainer),
-                  ),
-                  title: const Text('Curso Superior de Tecnologia em Sistemas para Internet'),
-                  subtitle: const Text(Identidade.turma),
                 ),
-                const Divider(height: 36),
-                Text(
-                  'Dispositivo (Canal Nativo Kotlin / MethodChannel)',
-                  style: textos.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Card(
-                  elevation: 0,
-                  color: cores.surfaceContainerHighest,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(color: cores.outlineVariant),
-                    borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: cores.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: cores.outlineVariant),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: dispositivo.when(
-                      loading: () => const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: CircularProgressIndicator(),
+                  child: Column(
+                    children: [
+                      for (final integrante in Identidade.integrantes)
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 22,
+                                backgroundColor: cores.primary.withValues(alpha: 0.15),
+                                child: Text(
+                                  integrante.nome.substring(0, 1),
+                                  style: TextStyle(
+                                    color: cores.primary,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      integrante.nome,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Matrícula institucional: ${integrante.matricula}',
+                                      style: TextStyle(
+                                        fontSize: 12.5,
+                                        color: cores.outline,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      Divider(height: 1, color: cores.outlineVariant.withValues(alpha: 0.5)),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 22,
+                              backgroundColor: cores.surfaceContainerHighest,
+                              child: Icon(Icons.school_outlined, color: cores.outline, size: 20),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Tecnologia em Sistemas para Internet (TSI)',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${Identidade.turma} · Docente: Prof. Me. Cláudio Ulhoa',
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      color: cores.outline,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      error: (erro, _) => Text(
-                        'Falha na consulta ao canal nativo: $erro',
-                        style: TextStyle(color: cores.error),
-                      ),
-                      data: (info) => info == null
-                          ? const Text(
-                              'Canal nativo indisponível nesta plataforma de execução.',
-                              style: TextStyle(fontStyle: FontStyle.italic),
-                            )
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _ItemInfo(
-                                  rotulo: 'Fabricante e Modelo',
-                                  valor: '${info.fabricante} ${info.modelo}',
-                                ),
-                                const SizedBox(height: 8),
-                                _ItemInfo(
-                                  rotulo: 'Versão do Android',
-                                  valor: 'Android ${info.versaoAndroid}',
-                                ),
-                                const SizedBox(height: 8),
-                                _ItemInfo(
-                                  rotulo: 'Nível de Carga da Bateria',
-                                  valor: '${info.nivelBateria}%',
-                                ),
-                              ],
-                            ),
-                    ),
+                    ],
                   ),
                 ),
                 const Divider(height: 36),
+                // Seção Diagnóstico do Hardware Nativo (Kotlin)
                 Text(
-                  'Persistência Relacional Local',
-                  style: textos.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Card(
-                  elevation: 0,
-                  color: cores.surfaceContainerHighest,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(color: cores.outlineVariant),
-                    borderRadius: BorderRadius.circular(12),
+                  'Dispositivo (Canal Nativo Kotlin / MethodChannel)',
+                  style: textos.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.01,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: bancoCriadoEm.when(
-                      loading: () => const Text('Consultando tabela de metadados...'),
-                      error: (erro, _) => Text(
-                        'Erro ao consultar metadados do SQLite: $erro',
-                        style: TextStyle(color: cores.error),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: cores.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: cores.outlineVariant),
+                  ),
+                  child: dispositivo.when(
+                    loading: () => const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(),
                       ),
-                      data: (data) => _ItemInfo(
-                        rotulo: 'Instanciação do Banco SQLite',
-                        valor: data == null
-                            ? 'Data de criação não registrada.'
-                            : 'Arquivo criado no armazenamento privado em ${_formatar(data)}.',
-                      ),
+                    ),
+                    error: (erro, _) => Text(
+                      'Falha na consulta ao canal nativo: $erro',
+                      style: TextStyle(color: cores.error),
+                    ),
+                    data: (info) => info == null
+                        ? const Text(
+                            'Canal nativo indisponível nesta plataforma de execução.',
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _ItemInfo(
+                                rotulo: 'Fabricante e Modelo',
+                                valor: '${info.fabricante} ${info.modelo}',
+                                icone: Icons.smartphone_outlined,
+                              ),
+                              const SizedBox(height: 12),
+                              _ItemInfo(
+                                rotulo: 'Versão do Android',
+                                valor: 'Android ${info.versaoAndroid}',
+                                icone: Icons.android_outlined,
+                              ),
+                              const SizedBox(height: 12),
+                              _ItemInfo(
+                                rotulo: 'Nível de Carga da Bateria',
+                                valor: '${info.nivelBateria}%',
+                                icone: Icons.battery_charging_full_outlined,
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+                const Divider(height: 36),
+                // Seção Persistência Relacional Local
+                Text(
+                  'Persistência Relacional Local (SQLite)',
+                  style: textos.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.01,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: cores.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: cores.outlineVariant),
+                  ),
+                  child: bancoCriadoEm.when(
+                    loading: () => const Text('Consultando tabela de metadados...'),
+                    error: (erro, _) => Text(
+                      'Erro ao consultar metadados do SQLite: $erro',
+                      style: TextStyle(color: cores.error),
+                    ),
+                    data: (data) => _ItemInfo(
+                      rotulo: 'Instanciação do Banco SQLite',
+                      valor: data == null
+                          ? 'Data de criação não registrada.'
+                          : 'Arquivo criado no armazenamento privado em ${_formatar(data)}.',
+                      icone: Icons.storage_outlined,
                     ),
                   ),
                 ),
@@ -178,26 +298,60 @@ class TelaSobre extends ConsumerWidget {
 }
 
 class _ItemInfo extends StatelessWidget {
-  const _ItemInfo({required this.rotulo, required this.valor});
+  const _ItemInfo({
+    required this.rotulo,
+    required this.valor,
+    this.icone,
+  });
 
   final String rotulo;
   final String valor;
+  final IconData? icone;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final tema = Theme.of(context);
+    final cores = tema.colorScheme;
+
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          rotulo,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.primary,
+        if (icone != null) ...[
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: cores.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icone, size: 16, color: cores.primary),
+          ),
+          const SizedBox(width: 12),
+        ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                rotulo,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: cores.primary,
+                  letterSpacing: -0.01,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                valor,
+                style: TextStyle(
+                  fontSize: 13.5,
+                  color: cores.onSurface,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 2),
-        Text(valor, style: const TextStyle(fontSize: 14)),
       ],
     );
   }
