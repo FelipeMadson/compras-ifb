@@ -7,7 +7,6 @@ import '../../dominio/item.dart';
 import '../../dominio/regras_item.dart';
 import '../componentes/cartao_item.dart';
 import '../componentes/faixa_offline.dart';
-import '../componentes/particulas_celebracao.dart';
 import '../providers.dart';
 
 class TelaLista extends ConsumerWidget {
@@ -116,29 +115,23 @@ class _Conteudo extends StatelessWidget {
                 ? 2
                 : 3;
 
-        return Stack(
-          children: [
-            CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(child: _CabecalhoResumo(resumo: resumo)),
-                SliverPadding(
-                  // Espaçamento inferior de 96dp para desobstrução visual do FloatingActionButton.
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
-                  sliver: SliverGrid.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: colunas,
-                      mainAxisExtent: alturaDoCartao,
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                    ),
-                    itemCount: itens.length,
-                    itemBuilder: (context, i) => CartaoItem(item: itens[i]),
-                  ),
+        return CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(child: _CabecalhoResumo(resumo: resumo)),
+            SliverPadding(
+              // Espaçamento inferior de 96dp para desobstrução visual do FloatingActionButton.
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+              sliver: SliverGrid.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: colunas,
+                  mainAxisExtent: alturaDoCartao,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
                 ),
-              ],
+                itemCount: itens.length,
+                itemBuilder: (context, i) => CartaoItem(item: itens[i]),
+              ),
             ),
-            if (resumo.total > 0 && resumo.comprados == resumo.total)
-              const ParticulasCelebracao(),
           ],
         );
       },
@@ -155,24 +148,17 @@ class _CabecalhoResumo extends StatelessWidget {
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
     final textos = tema.textTheme;
-    final concluido = resumo.total > 0 && resumo.comprados == resumo.total;
+    final cores = tema.colorScheme;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        decoration: BoxDecoration(
-          color: concluido
-              ? tema.colorScheme.primaryContainer.withValues(alpha: 0.25)
-              : tema.colorScheme.surfaceContainerHighest.withValues(alpha: 0.65),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: concluido
-                ? tema.colorScheme.primary.withValues(alpha: 0.4)
-                : tema.colorScheme.outlineVariant.withValues(alpha: 0.3),
-            width: 1,
-          ),
+      child: Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: cores.outlineVariant),
+          borderRadius: BorderRadius.circular(12),
         ),
+        color: cores.surfaceContainerLow,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -181,55 +167,29 @@ class _CabecalhoResumo extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Progresso das Compras',
-                        style: textos.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: tema.colorScheme.primary,
-                        ),
-                      ),
-                      if (concluido) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: tema.colorScheme.primary.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            '100% Concluído',
-                            style: textos.bodySmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: tema.colorScheme.primary,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
+                  Text(
+                    'Progresso das Compras',
+                    style: textos.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: cores.onSurface,
+                    ),
                   ),
                   Text(
                     '${resumo.comprados} de ${resumo.total} itens',
-                    style: textos.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+                    style: textos.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: cores.outline,
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0, end: resumo.progresso),
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, valor, _) {
-                    return LinearProgressIndicator(
-                      value: valor,
-                      minHeight: 8,
-                      backgroundColor: tema.colorScheme.surfaceContainerLow,
-                    );
-                  },
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: resumo.progresso,
+                  minHeight: 6,
+                  backgroundColor: cores.surfaceContainerHighest,
                 ),
               ),
               if (resumo.aguardandoEnvio > 0) ...[
@@ -239,12 +199,12 @@ class _CabecalhoResumo extends StatelessWidget {
                     Icon(
                       Icons.cloud_upload_outlined,
                       size: 16,
-                      color: tema.colorScheme.error,
+                      color: cores.error,
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '${resumo.aguardandoEnvio} modificação(ões) pendente(s) de sincronização remota.',
-                      style: textos.bodySmall?.copyWith(color: tema.colorScheme.error),
+                      '${resumo.aguardandoEnvio} modificação(ões) pendente(s) de sincronização.',
+                      style: textos.bodySmall?.copyWith(color: cores.error),
                     ),
                   ],
                 ),
