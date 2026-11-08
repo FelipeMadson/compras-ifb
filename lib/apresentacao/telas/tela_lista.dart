@@ -93,16 +93,21 @@ class TelaLista extends ConsumerWidget {
   }
 }
 
-class _Conteudo extends StatelessWidget {
-  const _Conteudo({required this.itens});
+class _Conteudo extends ConsumerWidget {
+  const _Conteudo({super.key, required this.itens});
 
   final List<Item> itens;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (itens.isEmpty) return const _EstadoVazio();
 
+    final itensFiltradosAsync = ref.watch(itensFiltradosProvider);
+    final itensExibidos = itensFiltradosAsync.value ?? itens;
+    final categoriaSelecionada = ref.watch(filtroCategoriaProvider);
+    final termoBusca = ref.watch(buscaTextoProvider);
     final resumo = resumir(itens);
+
     // Altura base proporcional à escala de fonte do sistema operacional (Acessibilidade WCAG).
     final alturaDoCartao = MediaQuery.textScalerOf(context).scale(84);
 
@@ -118,23 +123,251 @@ class _Conteudo extends StatelessWidget {
         return CustomScrollView(
           slivers: [
             SliverToBoxAdapter(child: _CabecalhoResumo(resumo: resumo)),
-            SliverPadding(
-              // Espaçamento inferior de 96dp para desobstrução visual do FloatingActionButton.
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
-              sliver: SliverGrid.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: colunas,
-                  mainAxisExtent: alturaDoCartao,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                ),
-                itemCount: itens.length,
-                itemBuilder: (context, i) => CartaoItem(item: itens[i]),
+            SliverToBoxAdapter(
+              child: _BarraDePesquisaEFiltros(
+                todosOsItens: itens,
+                categoriaSelecionada: categoriaSelecionada,
+                termoBusca: termoBusca,
+                aoSelecionarCategoria: (cat) {
+                  ref.read(filtroCategoriaProvider.notifier).state = cat;
+                },
+                aoMudarBusca: (txt) {
+                  ref.read(buscaTextoProvider.notifier).state = txt;
+                },
               ),
             ),
+            if (itensExibidos.isEmpty)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.search_off_rounded,
+                          size: 44,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Nenhum item correspondente encontrado.',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.outline,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () {
+                            ref.read(filtroCategoriaProvider.notifier).state = null;
+                            ref.read(buscaTextoProvider.notifier).state = '';
+                          },
+                          child: const Text('Limpar filtros'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            else
+              SliverPadding(
+                // Espaçamento inferior de 96dp para desobstrução visual do FloatingActionButton.
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+                sliver: SliverGrid.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: colunas,
+                    mainAxisExtent: alturaDoCartao,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                  ),
+                  itemCount: itensExibidos.length,
+                  itemBuilder: (context, i) => CartaoItem(item: itensExibidos[i]),
+                ),
+              ),
           ],
         );
       },
+    );
+  }
+}
+
+class _BarraDePesquisaEFiltros extends StatelessWidget {
+  const _BarraDePesquisaEFiltros({
+    required this.todosOsItens,
+    required this.categoriaSelecionada,
+    required this.termoBusca,
+    required this.aoSelecionarCategoria,
+    required this.aoMudarBusca,
+  });
+
+  final List<Item> todosOsItens;
+  final String? categoriaSelecionada;
+  final String termoBusca;
+  final ValueChanged<String?> aoSelecionarCategoria;
+  final ValueChanged<String> aoMudarBusca;
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final cores = tema.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Campo de busca linear rápido
+          Container(
+            height: 42,
+            decoration: BoxDecoration(
+              color: cores.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: cores.outlineVariant),
+            ),
+            child: TextField(
+              onChanged: aoMudarBusca,
+              style: const TextStyle(fontSize: 13.5),
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                hintText: 'Filtrar por nome ou observação...',
+                hintStyle: TextStyle(
+                  color: cores.outline.withValues(alpha: 0.7),
+                  fontSize: 13,
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  size: 18,
+                  color: cores.outline,
+                ),
+                suffixIcon: termoBusca.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.close, size: 16),
+                        onPressed: () => aoMudarBusca(''),
+                      )
+                    : null,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                filled: false,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          // Chips de categorias horizontais
+          SizedBox(
+            height: 32,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                _ChipCategoria(
+                  rotulo: 'Todas',
+                  quantidade: todosOsItens.length,
+                  selecionado: categoriaSelecionada == null,
+                  aoClicar: () => aoSelecionarCategoria(null),
+                ),
+                for (final cat in Identidade.categorias)
+                  _ChipCategoria(
+                    rotulo: cat,
+                    icone: Identidade.iconeDaCategoria(cat),
+                    cor: Identidade.corDaCategoria(cat),
+                    quantidade: todosOsItens.where((i) => i.categoria == cat).length,
+                    selecionado: categoriaSelecionada == cat,
+                    aoClicar: () => aoSelecionarCategoria(
+                      categoriaSelecionada == cat ? null : cat,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ChipCategoria extends StatelessWidget {
+  const _ChipCategoria({
+    required this.rotulo,
+    required this.quantidade,
+    required this.selecionado,
+    required this.aoClicar,
+    this.icone,
+    this.cor,
+  });
+
+  final String rotulo;
+  final int quantidade;
+  final bool selecionado;
+  final VoidCallback aoClicar;
+  final IconData? icone;
+  final Color? cor;
+
+  @override
+  Widget build(BuildContext context) {
+    final cores = Theme.of(context).colorScheme;
+    final corAcento = cor ?? cores.primary;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: Material(
+        color: selecionado
+            ? corAcento.withValues(alpha: 0.18)
+            : cores.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: aoClicar,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: selecionado
+                    ? corAcento
+                    : cores.outlineVariant.withValues(alpha: 0.8),
+                width: selecionado ? 1.2 : 0.8,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (icone != null) ...[
+                  Icon(icone, size: 12, color: selecionado ? corAcento : cores.outline),
+                  const SizedBox(width: 5),
+                ],
+                Text(
+                  rotulo,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: selecionado ? FontWeight.w700 : FontWeight.w500,
+                    color: selecionado ? corAcento : cores.onSurface,
+                  ),
+                ),
+                if (quantidade > 0) ...[
+                  const SizedBox(width: 5),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: selecionado
+                          ? corAcento.withValues(alpha: 0.25)
+                          : cores.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '$quantidade',
+                      style: TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.bold,
+                        color: selecionado ? corAcento : cores.outline,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

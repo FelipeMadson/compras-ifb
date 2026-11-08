@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../config/identidade.dart';
 import '../../dominio/item.dart';
 import '../providers.dart';
 
 /// Cartão de item com acabamento visual Linear/Apple HIG:
-/// Micro-compressão tátil (scale 0.98), bordas cirúrgicas de 1px e badges limpos.
+/// Micro-compressão tátil (scale 0.982), barra de acentuação vertical, badges categóricos com ícone e bordas cirúrgicas.
 class CartaoItem extends ConsumerStatefulWidget {
   const CartaoItem({super.key, required this.item});
 
@@ -24,6 +26,8 @@ class _CartaoItemState extends ConsumerState<CartaoItem> {
     final item = widget.item;
     final cores = Theme.of(context).colorScheme;
     final notifier = ref.read(itensProvider.notifier);
+    final corCategoria = Identidade.corDaCategoria(item.categoria);
+    final iconeCategoria = Identidade.iconeDaCategoria(item.categoria);
 
     return Dismissible(
       key: ValueKey(item.id),
@@ -52,7 +56,10 @@ class _CartaoItemState extends ConsumerState<CartaoItem> {
           ],
         ),
       ),
-      onDismissed: (_) => notifier.excluir(item),
+      onDismissed: (_) {
+        HapticFeedback.mediumImpact();
+        notifier.excluir(item);
+      },
       child: AnimatedScale(
         scale: _pressionado ? 0.982 : 1.0,
         duration: const Duration(milliseconds: 100),
@@ -62,11 +69,11 @@ class _CartaoItemState extends ConsumerState<CartaoItem> {
           curve: Curves.easeInOut,
           decoration: BoxDecoration(
             color: item.comprado
-                ? cores.surfaceContainerHighest.withValues(alpha: 0.3)
+                ? cores.surfaceContainerHighest.withValues(alpha: 0.25)
                 : cores.surfaceContainerLow,
             border: Border.all(
               color: item.comprado
-                  ? cores.outlineVariant.withValues(alpha: 0.4)
+                  ? cores.outlineVariant.withValues(alpha: 0.35)
                   : cores.outlineVariant,
               width: 1,
             ),
@@ -80,18 +87,33 @@ class _CartaoItemState extends ConsumerState<CartaoItem> {
               onHighlightChanged: (p) => setState(() => _pressionado = p),
               onTap: () => context.go('/item/${item.id}'),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 child: Row(
                   children: [
-                    // Checkbox nativo com feedback suave
+                    // Barra vertical sutil de categorização (Padrão Linear Status Bar)
+                    Container(
+                      width: 3.5,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: item.comprado
+                            ? corCategoria.withValues(alpha: 0.3)
+                            : corCategoria,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    // Checkbox com resposta tátil nativa
                     Transform.scale(
                       scale: 1.05,
                       child: Checkbox(
                         value: item.comprado,
-                        onChanged: (_) => notifier.alternarComprado(item),
+                        onChanged: (_) {
+                          HapticFeedback.selectionClick();
+                          notifier.alternarComprado(item);
+                        },
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
                     // Detalhes do item
                     Expanded(
                       child: Column(
@@ -129,20 +151,31 @@ class _CartaoItemState extends ConsumerState<CartaoItem> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: cores.surfaceContainerHighest,
+                                  color: corCategoria.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(5),
                                   border: Border.all(
-                                    color: cores.outlineVariant.withValues(alpha: 0.6),
+                                    color: corCategoria.withValues(alpha: 0.28),
                                     width: 0.8,
                                   ),
                                 ),
-                                child: Text(
-                                  item.categoria,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: cores.onSurfaceVariant,
-                                  ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      iconeCategoria,
+                                      size: 11,
+                                      color: corCategoria,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      item.categoria,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: corCategoria,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               const SizedBox(width: 8),

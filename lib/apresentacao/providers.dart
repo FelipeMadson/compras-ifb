@@ -70,6 +70,30 @@ final itensProvider = AsyncNotifierProvider<ItensNotifier, List<Item>>(
   ItensNotifier.new,
 );
 
+/// Filtro de categoria ativa (null representa todas as categorias).
+final filtroCategoriaProvider = StateProvider<String?>((ref) => null);
+
+/// Termo de busca digitado pelo usuário para filtragem rápida.
+final buscaTextoProvider = StateProvider<String>((ref) => '');
+
+/// Coleção derivada de itens aplicando filtros de categoria e busca.
+final itensFiltradosProvider = Provider<AsyncValue<List<Item>>>((ref) {
+  final itensAsync = ref.watch(itensProvider);
+  final categoria = ref.watch(filtroCategoriaProvider);
+  final busca = ref.watch(buscaTextoProvider).trim().toLowerCase();
+
+  return itensAsync.whenData((itens) {
+    if (categoria == null && busca.isEmpty) return itens;
+    return itens.where((item) {
+      final bateCategoria = categoria == null || item.categoria == categoria;
+      final bateBusca = busca.isEmpty ||
+          item.nome.toLowerCase().contains(busca) ||
+          item.observacao.toLowerCase().contains(busca);
+      return bateCategoria && bateBusca;
+    }).toList();
+  });
+});
+
 class ItensNotifier extends AsyncNotifier<List<Item>> {
   ItemRepository get _repositorio => ref.read(itemRepositoryProvider);
 

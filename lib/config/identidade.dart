@@ -46,4 +46,34 @@ abstract final class Identidade {
     'Limpeza',
     'Higiene Pessoal',
   ];
+
+  /// Retorna o ícone contextual e semântico representativo de cada categoria.
+  static IconData iconeDaCategoria(String categoria) {
+    return switch (categoria) {
+      'Hortifrúti' => Icons.eco_outlined,
+      'Mercearia' => Icons.shopping_basket_outlined,
+      'Laticínios' => Icons.egg_outlined,
+      'Açougue e Frios' => Icons.restaurant_outlined,
+      'Padaria' => Icons.bakery_dining_outlined,
+      'Bebidas' => Icons.local_cafe_outlined,
+      'Limpeza' => Icons.cleaning_services_outlined,
+      'Higiene Pessoal' => Icons.spa_outlined,
+      _ => Icons.category_outlined,
+    };
+  }
+
+  /// Retorna a cor de acentuação categórica no padrão Linear.
+  static Color corDaCategoria(String categoria) {
+    return switch (categoria) {
+      'Hortifrúti' => const Color(0xFF10B981),
+      'Mercearia' => const Color(0xFFF59E0B),
+      'Laticínios' => const Color(0xFF06B6D4),
+      'Açougue e Frios' => const Color(0xFFF43F5E),
+      'Padaria' => const Color(0xFFD97706),
+      'Bebidas' => const Color(0xFF8B5CF6),
+      'Limpeza' => const Color(0xFF0284C7),
+      'Higiene Pessoal' => const Color(0xFF14B8A6),
+      _ => const Color(0xFF6B7280),
+    };
+  }
 }

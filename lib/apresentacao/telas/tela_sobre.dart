@@ -5,11 +5,39 @@ import '../../config/identidade.dart';
 import '../providers.dart';
 
 /// Tela institucional com créditos acadêmicos, diagnóstico de hardware via canal nativo e metadados SQLite.
-class TelaSobre extends ConsumerWidget {
+class TelaSobre extends ConsumerStatefulWidget {
   const TelaSobre({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TelaSobre> createState() => _TelaSobreState();
+}
+
+class _TelaSobreState extends ConsumerState<TelaSobre> {
+  String? _statusIntegridade;
+  bool _verificandoIntegridade = false;
+
+  Future<void> _verificarIntegridadeSqlite() async {
+    setState(() => _verificandoIntegridade = true);
+    try {
+      final db = await ref.read(bancoDeDadosProvider).abrir();
+      final res = await db.rawQuery('PRAGMA integrity_check');
+      final msg = res.isNotEmpty ? res.first.values.first.toString() : 'ok';
+      setState(() {
+        _statusIntegridade = msg.toLowerCase() == 'ok'
+            ? 'Integridade Verificada: 100% íntegro (0 inconsistências encontradas).'
+            : 'Aviso de integridade: $msg';
+        _verificandoIntegridade = false;
+      });
+    } catch (e) {
+      setState(() {
+        _statusIntegridade = 'Erro ao verificar integridade: $e';
+        _verificandoIntegridade = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final tema = Theme.of(context);
     final textos = tema.textTheme;
     final cores = tema.colorScheme;
@@ -201,12 +229,22 @@ class TelaSobre extends ConsumerWidget {
                 ),
                 const Divider(height: 36),
                 // Seção Diagnóstico do Hardware Nativo (Kotlin)
-                Text(
-                  'Dispositivo (Canal Nativo Kotlin / MethodChannel)',
-                  style: textos.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.01,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Dispositivo (Canal Nativo Kotlin)',
+                      style: textos.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.01,
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Atualizar telemetria de hardware',
+                      icon: const Icon(Icons.refresh, size: 18),
+                      onPressed: () => ref.refresh(infoDispositivoProvider),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 Container(
@@ -273,19 +311,82 @@ class TelaSobre extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: cores.outlineVariant),
                   ),
-                  child: bancoCriadoEm.when(
-                    loading: () => const Text('Consultando tabela de metadados...'),
-                    error: (erro, _) => Text(
-                      'Erro ao consultar metadados do SQLite: $erro',
-                      style: TextStyle(color: cores.error),
-                    ),
-                    data: (data) => _ItemInfo(
-                      rotulo: 'Instanciação do Banco SQLite',
-                      valor: data == null
-                          ? 'Data de criação não registrada.'
-                          : 'Arquivo criado no armazenamento privado em ${_formatar(data)}.',
-                      icone: Icons.storage_outlined,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      bancoCriadoEm.when(
+                        loading: () => const Text('Consultando tabela de metadados...'),
+                        error: (erro, _) => Text(
+                          'Erro ao consultar metadados do SQLite: $erro',
+                          style: TextStyle(color: cores.error),
+                        ),
+                        data: (data) => _ItemInfo(
+                          rotulo: 'Instanciação do Banco SQLite',
+                          valor: data == null
+                              ? 'Data de criação não registrada.'
+                              : 'Arquivo criado no armazenamento privado em ${_formatar(data)}.',
+                          icone: Icons.storage_outlined,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Divider(height: 1, color: cores.outlineVariant.withValues(alpha: 0.5)),
+                      const SizedBox(height: 14),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Auditoria de Integridade (PRAGMA)',
+                            style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: _verificandoIntegridade
+                                ? null
+                                : _verificarIntegridadeSqlite,
+                            icon: _verificandoIntegridade
+                                ? const SizedBox.square(
+                                    dimension: 12,
+                                    child: CircularProgressIndicator(strokeWidth: 1.5),
+                                  )
+                                : const Icon(Icons.verified_outlined, size: 14),
+                            label: const Text('Executar Teste', style: TextStyle(fontSize: 11)),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (_statusIntegridade != null) ...[
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: cores.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: cores.primary.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.check_circle_outline, size: 16, color: cores.primary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _statusIntegridade!,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: cores.primary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ],
@@ -294,6 +395,8 @@ class TelaSobre extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
   }
 }
 

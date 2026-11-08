@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -82,6 +83,7 @@ class _FormularioItemState extends ConsumerState<FormularioItem> {
   }
 
   void _mudarQuantidade(int variacao) {
+    HapticFeedback.lightImpact();
     setState(() {
       _quantidade = ajustarQuantidade(_quantidade, variacao);
       _alterado = true;
@@ -218,7 +220,17 @@ class _FormularioItemState extends ConsumerState<FormularioItem> {
                         for (final categoria in categorias)
                           DropdownMenuItem(
                             value: categoria,
-                            child: Text(categoria),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Identidade.iconeDaCategoria(categoria),
+                                  size: 16,
+                                  color: Identidade.corDaCategoria(categoria),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(categoria),
+                              ],
+                            ),
                           ),
                       ],
                       onChanged: (valor) {
@@ -227,6 +239,57 @@ class _FormularioItemState extends ConsumerState<FormularioItem> {
                           _marcarAlterado();
                         }
                       },
+                    ),
+                    const SizedBox(height: 10),
+                    // Atalhos Rápidos de Categoria em Chips
+                    SizedBox(
+                      height: 32,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: [
+                          for (final cat in Identidade.categorias)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 6),
+                              child: ChoiceChip(
+                                label: Text(cat),
+                                avatar: Icon(
+                                  Identidade.iconeDaCategoria(cat),
+                                  size: 13,
+                                  color: _categoria == cat
+                                      ? Identidade.corDaCategoria(cat)
+                                      : cores.outline,
+                                ),
+                                selected: _categoria == cat,
+                                onSelected: (_) {
+                                  HapticFeedback.selectionClick();
+                                  setState(() => _categoria = cat);
+                                  _marcarAlterado();
+                                },
+                                labelStyle: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: _categoria == cat
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  color: _categoria == cat
+                                      ? Identidade.corDaCategoria(cat)
+                                      : cores.onSurface,
+                                ),
+                                selectedColor: Identidade.corDaCategoria(cat)
+                                    .withValues(alpha: 0.16),
+                                backgroundColor: cores.surfaceContainerLow,
+                                side: BorderSide(
+                                  color: _categoria == cat
+                                      ? Identidade.corDaCategoria(cat)
+                                      : cores.outlineVariant,
+                                  width: _categoria == cat ? 1.2 : 0.8,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 20),
                     // Seletor Estilizado de Quantidade (Padrão Apple HIG Stepper)
@@ -243,98 +306,149 @@ class _FormularioItemState extends ConsumerState<FormularioItem> {
                           width: 1,
                         ),
                       ),
-                      child: Row(
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Quantidade',
-                                  style: textos.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: -0.01,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Quantidade',
+                                      style: textos.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: -0.01,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Unidades a adquirir',
+                                      style: textos.bodySmall?.copyWith(
+                                        color: cores.outline,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Botão Diminuir
+                              Material(
+                                color: cores.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(10),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(10),
+                                  onTap: _quantidade > quantidadeMinima
+                                      ? () => _mudarQuantidade(-1)
+                                      : null,
+                                  child: Container(
+                                    width: 38,
+                                    height: 38,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color: cores.outlineVariant
+                                            .withValues(alpha: 0.6),
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.remove,
+                                      size: 18,
+                                      color: _quantidade > quantidadeMinima
+                                          ? cores.onSurface
+                                          : cores.outline.withValues(alpha: 0.4),
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Unidades a adquirir',
-                                  style: textos.bodySmall?.copyWith(
-                                    color: cores.outline,
+                              ),
+                              // Valor Numérico
+                              Container(
+                                constraints: const BoxConstraints(minWidth: 50),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '$_quantidade',
+                                  style: textos.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                              ),
+                              // Botão Aumentar
+                              Material(
+                                color: cores.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(10),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(10),
+                                  onTap: _quantidade < quantidadeMaxima
+                                      ? () => _mudarQuantidade(1)
+                                      : null,
+                                  child: Container(
+                                    width: 38,
+                                    height: 38,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color: cores.outlineVariant
+                                            .withValues(alpha: 0.6),
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.add,
+                                      size: 18,
+                                      color: _quantidade < quantidadeMaxima
+                                          ? cores.onSurface
+                                          : cores.outline.withValues(alpha: 0.4),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          // Botões de Presets Rápidos
+                          Row(
+                            children: [
+                              Text(
+                                'Ajuste rápido: ',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: cores.outline,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              for (final inc in [1, 2, 5, 10]) ...[
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 6),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(6),
+                                    onTap: () => _mudarQuantidade(inc),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 3,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: cores.surfaceContainerHighest,
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(
+                                          color: cores.outlineVariant
+                                              .withValues(alpha: 0.7),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        '+$inc',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: cores.onSurface,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
-                            ),
-                          ),
-                          // Botão Diminuir
-                          Material(
-                            color: cores.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(10),
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(10),
-                              onTap: _quantidade > quantidadeMinima
-                                  ? () => _mudarQuantidade(-1)
-                                  : null,
-                              child: Container(
-                                width: 38,
-                                height: 38,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: cores.outlineVariant.withValues(alpha: 0.6),
-                                  ),
-                                ),
-                                child: Icon(
-                                  Icons.remove,
-                                  size: 18,
-                                  color: _quantidade > quantidadeMinima
-                                      ? cores.onSurface
-                                      : cores.outline.withValues(alpha: 0.4),
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Valor Numérico
-                          Container(
-                            constraints: const BoxConstraints(minWidth: 50),
-                            alignment: Alignment.center,
-                            child: Text(
-                              '$_quantidade',
-                              style: textos.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 17,
-                              ),
-                            ),
-                          ),
-                          // Botão Aumentar
-                          Material(
-                            color: cores.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(10),
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(10),
-                              onTap: _quantidade < quantidadeMaxima
-                                  ? () => _mudarQuantidade(1)
-                                  : null,
-                              child: Container(
-                                width: 38,
-                                height: 38,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: cores.outlineVariant.withValues(alpha: 0.6),
-                                  ),
-                                ),
-                                child: Icon(
-                                  Icons.add,
-                                  size: 18,
-                                  color: _quantidade < quantidadeMaxima
-                                      ? cores.onSurface
-                                      : cores.outline.withValues(alpha: 0.4),
-                                ),
-                              ),
-                            ),
+                            ],
                           ),
                         ],
                       ),
