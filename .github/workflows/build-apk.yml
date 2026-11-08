@@ -1,0 +1,81 @@
+name: Build & Release APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Configurar Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Baixar Dependências
+        run: flutter pub get
+
+      - name: Análise Estática de Código
+        run: flutter analyze
+
+      - name: Executar Testes Automatizados
+        run: flutter test
+
+      - name: Compilar APK Release
+        run: flutter build apk --release
+
+      - name: Upload Artifact do APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Publicar Release Oficial no GitHub
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/heads/main')
+        with:
+          tag_name: v1.0.0
+          name: Release v1.0.0 — Lista de Compras IFB (APK Oficial)
+          body: |
+            ## Lista de Compras IFB — Avaliação 1 (DPDMV 2026/2)
+            
+            Artefato de compilação oficial para a Avaliação 1 da disciplina de Desenvolvimento para Dispositivos Móveis 2026/2 no IFB Campus Brasília.
+            
+            ### Especificações da Versão:
+            - **Autor:** Felipe Madison da Silva Veloso (Matrícula: 69815)
+            - **Docente:** Prof. Me. Cláudio Ulhoa
+            - **Application ID:** `br.edu.ifb.felipemadison.compras`
+            - **Versão:** 1.0.0 (Build 1)
+            - **Padrão de Compilação:** APK Universal (compatível com arm64-v8a, armeabi-v7a e x86_64)
+            - **Documentação Web / GitHub Pages:** https://felipemadson.github.io/compras-ifb/
+            
+            ### Como Instalar no Dispositivo:
+            1. Baixe o arquivo `app-release.apk` anexado abaixo no seu celular Android;
+            2. Toque no arquivo baixado e conceda permissão para instalar aplicativos de fontes desconhecidas se solicitado;
+            3. Alternativamente, via terminal com o aparelho conectado em modo de depuração:
+               ```powershell
+               adb install -r app-release.apk
+               ```
+          files: build/app/outputs/flutter-apk/app-release.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
