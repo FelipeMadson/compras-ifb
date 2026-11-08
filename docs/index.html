@@ -5,25 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lista de Compras IFB — Aplicativo Móvel com SQLite e Arquitetura em Camadas</title>
   <meta name="description" content="Projeto prático desenvolvido para a disciplina de Desenvolvimento para Dispositivos Móveis (DPDMV 2026/2) no IFB Campus Brasília. Flutter, Riverpod, SQLite e canal nativo Kotlin.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0f17;
-      --bg-card: #111827;
-      --bg-card-subtle: #172033;
-      --border: #1f293d;
-      --border-focus: #0d9488;
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
+      --bg: #090d16;
+      --bg-surface: #0f172a;
+      --bg-card: #131c31;
+      --bg-card-hover: #18233c;
+      --border: #1e293b;
+      --border-accent: #0d9488;
       --primary: #14b8a6;
-      --primary-hover: #0d9488;
+      --primary-hover: #0f766e;
       --primary-dim: rgba(20, 184, 166, 0.12);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
       --accent: #38bdf8;
-      --success: #22c55e;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
       --mono: 'JetBrains Mono', monospace;
-      --sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
 
     * {
@@ -38,21 +43,23 @@
       font-family: var(--sans);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
+    /* Navegação */
     header.nav {
       position: sticky;
       top: 0;
-      z-index: 50;
-      backdrop-filter: blur(12px);
-      background: rgba(11, 15, 23, 0.82);
+      z-index: 100;
+      backdrop-filter: blur(14px);
+      background: rgba(9, 13, 22, 0.88);
       border-bottom: 1px solid var(--border);
     }
 
     .nav-container {
-      max-width: 1120px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 1rem 1.5rem;
+      padding: 0.9rem 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -68,27 +75,45 @@
       font-size: 1.05rem;
     }
 
-    .brand-tag {
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--primary-dim);
+      border: 1px solid rgba(20, 184, 166, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+
+    .brand-badge {
       background: var(--primary-dim);
       color: var(--primary);
       border: 1px solid rgba(20, 184, 166, 0.25);
       font-family: var(--mono);
-      font-size: 0.72rem;
-      padding: 0.2rem 0.5rem;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
       border-radius: 4px;
-      letter-spacing: 0.04em;
+      font-weight: 600;
     }
 
-    .nav-links {
+    .nav-actions {
       display: flex;
       align-items: center;
       gap: 1.25rem;
     }
 
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 500;
       transition: color 0.2s;
     }
@@ -100,11 +125,11 @@
     .btn-github {
       display: inline-flex;
       align-items: center;
-      gap: 0.45rem;
-      padding: 0.45rem 0.9rem;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       color: var(--text);
       text-decoration: none;
       font-size: 0.85rem;
@@ -113,49 +138,55 @@
     }
 
     .btn-github:hover {
-      border-color: var(--border-focus);
-      background: var(--bg-card-subtle);
+      border-color: var(--border-accent);
+      background: var(--bg-card-hover);
     }
 
+    /* Layout Principal */
     main {
-      max-width: 1120px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 3rem 1.5rem 6rem;
+      padding: 2.5rem 1.5rem 6rem;
     }
 
-    .hero {
-      padding: 3rem 0 4rem;
+    /* Hero Section com Grid */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 3rem;
+      align-items: center;
+      padding: 2rem 0 4rem;
       border-bottom: 1px solid var(--border);
     }
 
     .hero-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
     }
 
-    .badge {
+    .pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      font-size: 0.75rem;
-      padding: 0.25rem 0.65rem;
-      border-radius: 999px;
-      font-weight: 600;
-      background: var(--bg-card-subtle);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
     }
 
-    .badge.active {
-      background: rgba(34, 197, 94, 0.1);
-      border-color: rgba(34, 197, 94, 0.3);
+    .pill.active {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
       color: var(--success);
     }
 
     h1 {
-      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
       font-weight: 800;
       line-height: 1.15;
       letter-spacing: -0.03em;
@@ -163,15 +194,14 @@
       color: #ffffff;
     }
 
-    .hero-lead {
-      font-size: 1.15rem;
+    .hero-desc {
+      font-size: 1.05rem;
       color: var(--text-muted);
-      max-width: 780px;
-      margin-bottom: 2rem;
       line-height: 1.7;
+      margin-bottom: 2rem;
     }
 
-    .hero-actions {
+    .hero-btns {
       display: flex;
       flex-wrap: wrap;
       gap: 1rem;
@@ -187,12 +217,12 @@
       text-decoration: none;
       font-weight: 700;
       border-radius: 8px;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       transition: all 0.2s;
     }
 
     .btn-primary:hover {
-      background: var(--primary-hover);
+      background: #2dd4bf;
       transform: translateY(-1px);
     }
 
@@ -207,41 +237,249 @@
       text-decoration: none;
       font-weight: 600;
       border-radius: 8px;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       transition: all 0.2s;
     }
 
     .btn-secondary:hover {
-      border-color: var(--border-focus);
-      background: var(--bg-card-subtle);
+      border-color: var(--border-accent);
+      background: var(--bg-card-hover);
     }
 
+    /* Simulador de App Móvel */
+    .phone-wrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    .phone-frame {
+      width: 340px;
+      height: 640px;
+      background: #000000;
+      border-radius: 36px;
+      border: 8px solid #1e293b;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-family: var(--sans);
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 18px;
+      background: #1e293b;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      z-index: 30;
+    }
+
+    .phone-appbar {
+      background: #004d40;
+      color: #ffffff;
+      padding: 24px 14px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .appbar-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .appbar-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .appbar-icon {
+      background: none;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+    }
+
+    .phone-offline-banner {
+      background: #334155;
+      color: #cbd5e1;
+      padding: 6px 12px;
+      font-size: 0.72rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s;
+    }
+
+    .phone-content {
+      flex: 1;
+      background: #0f172a;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sim-progress-card {
+      background: #1e293b;
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .sim-progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .sim-bar-bg {
+      background: #334155;
+      height: 6px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .sim-bar-fill {
+      background: #14b8a6;
+      height: 100%;
+      width: 50%;
+      transition: width 0.3s;
+    }
+
+    .sim-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .sim-item {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+
+    .sim-item:hover {
+      background: #243247;
+    }
+
+    .sim-checkbox {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 2px solid #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: transparent;
+      transition: all 0.2s;
+    }
+
+    .sim-item.bought .sim-checkbox {
+      background: #14b8a6;
+      border-color: #14b8a6;
+      color: #042f2e;
+    }
+
+    .sim-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sim-item-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sim-item.bought .sim-item-name {
+      text-decoration: line-through;
+      color: #64748b;
+    }
+
+    .sim-item-sub {
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+
+    .sim-item-status {
+      font-size: 0.95rem;
+      color: #14b8a6;
+    }
+
+    .sim-fab {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: #14b8a6;
+      color: #042f2e;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.2s;
+    }
+
+    .sim-fab:hover {
+      transform: scale(1.05);
+    }
+
+    /* Seções Técnicas */
     section {
       padding: 4rem 0 2rem;
     }
 
-    .section-header {
-      margin-bottom: 2.5rem;
-    }
-
     .section-eyebrow {
       font-family: var(--mono);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--primary);
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
     }
 
     .section-title {
       font-size: 1.85rem;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
     }
 
-    .arch-grid {
+    .grid-3 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 1.5rem;
     }
 
@@ -250,11 +488,12 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.75rem;
-      transition: border-color 0.2s;
+      transition: all 0.2s;
     }
 
     .card:hover {
-      border-color: var(--border-focus);
+      border-color: var(--border-accent);
+      background: var(--bg-card-hover);
     }
 
     .card-label {
@@ -263,7 +502,7 @@
       color: var(--primary);
       text-transform: uppercase;
       margin-bottom: 0.5rem;
-      letter-spacing: 0.05em;
+      font-weight: 600;
     }
 
     .card-title {
@@ -272,7 +511,7 @@
       margin-bottom: 0.75rem;
     }
 
-    .card-body {
+    .card-desc {
       font-size: 0.92rem;
       color: var(--text-muted);
       line-height: 1.6;
@@ -280,7 +519,7 @@
 
     .card ul {
       margin-top: 1rem;
-      padding-left: 1.25rem;
+      padding-left: 1.2rem;
       font-size: 0.88rem;
       color: var(--text-muted);
     }
@@ -289,70 +528,39 @@
       margin-bottom: 0.4rem;
     }
 
-    .code-block {
-      background: #06090e;
+    .code-box {
+      background: #050811;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 1.25rem;
       font-family: var(--mono);
-      font-size: 0.84rem;
+      font-size: 0.85rem;
       overflow-x: auto;
-      margin-top: 1.5rem;
       color: #e2e8f0;
-      line-height: 1.5;
+      line-height: 1.6;
+      margin-top: 1rem;
     }
 
-    .table-container {
-      overflow-x: auto;
+    .author-card {
+      background: linear-gradient(135deg, #0f172a 0%, #131c31 100%);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      margin-top: 1.5rem;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-      text-align: left;
-    }
-
-    th {
-      background: var(--bg-card-subtle);
-      padding: 0.85rem 1.25rem;
-      font-weight: 600;
-      color: var(--text);
-      border-bottom: 1px solid var(--border);
-    }
-
-    td {
-      padding: 0.85rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-      color: var(--text-muted);
-    }
-
-    tr:last-child td {
-      border-bottom: none;
-    }
-
-    .profile-card {
-      background: linear-gradient(145deg, #111827 0%, #0d131f 100%);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 2rem;
+      border-radius: 16px;
+      padding: 2.5rem;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 1.5rem;
+      gap: 2rem;
+      margin-top: 3rem;
     }
 
-    .profile-info h3 {
-      font-size: 1.3rem;
-      font-weight: 700;
+    .author-left h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
       margin-bottom: 0.35rem;
     }
 
-    .profile-info p {
+    .author-left p {
       color: var(--text-muted);
       font-size: 0.95rem;
     }
@@ -361,16 +569,17 @@
       border-top: 1px solid var(--border);
       padding: 2.5rem 1.5rem;
       text-align: center;
-      color: var(--text-muted);
+      color: var(--text-dim);
       font-size: 0.85rem;
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 900px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
       .nav-links {
         display: none;
-      }
-      .hero {
-        padding: 1.5rem 0 2.5rem;
       }
     }
   </style>
@@ -380,58 +589,104 @@
   <header class="nav">
     <div class="nav-container">
       <a href="#" class="brand">
+        <div class="brand-icon">🛒</div>
         <span>Compras IFB</span>
-        <span class="brand-tag">DPDMV 2026/2</span>
+        <span class="brand-badge">DPDMV 2026/2</span>
       </a>
-      <div class="nav-links">
-        <a href="#arquitetura">Arquitetura</a>
-        <a href="#sqlite">Banco SQLite</a>
-        <a href="#testes">Testes</a>
-        <a href="#instalacao">Como Instalar</a>
+      <div class="nav-actions">
+        <nav class="nav-links">
+          <a href="#simulador">Simulador</a>
+          <a href="#arquitetura">Arquitetura</a>
+          <a href="#sqlite">SQLite</a>
+          <a href="#testes">Testes</a>
+          <a href="#download">Download APK</a>
+        </nav>
+        <a href="https://github.com/FelipeMadson/compras-ifb" class="btn-github" target="_blank" rel="noopener">
+          <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
       </div>
-      <a href="https://github.com/FelipeMadson/compras-ifb" class="btn-github" target="_blank" rel="noopener">
-        <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-        </svg>
-        <span>Repositório</span>
-      </a>
     </div>
   </header>
 
   <main>
-    <section class="hero">
-      <div class="hero-meta">
-        <span class="badge active">● Avaliação 1 Concluída</span>
-        <span class="badge">IFB Campus Brasília</span>
-        <span class="badge">Sistemas para Internet</span>
+    <!-- HERO SECTION COM SIMULADOR INTEGRADO -->
+    <section class="hero-grid">
+      <div class="hero-content">
+        <div class="hero-meta">
+          <span class="pill active">● Avaliação 1 Concluída</span>
+          <span class="pill">IFB Campus Brasília</span>
+          <span class="pill">Sistemas para Internet</span>
+        </div>
+        <h1>Lista de Compras Móvel com SQLite e Arquitetura em Camadas</h1>
+        <p class="hero-desc">
+          Implementação integral do tutorial integrador da <strong>Aula 15</strong> da disciplina de Desenvolvimento para Dispositivos Móveis.
+          Engenharia focada em <em>offline-first</em>, banco relacional SQLite local, inversão de controle via Riverpod e canal nativo de plataforma em Kotlin.
+        </p>
+        <div class="hero-btns">
+          <a href="https://github.com/FelipeMadson/compras-ifb" class="btn-primary" target="_blank" rel="noopener">
+            Repositório no GitHub
+          </a>
+          <a href="https://github.com/FelipeMadson/compras-ifb/actions" class="btn-secondary" target="_blank" rel="noopener">
+            Esteira de CI/CD (Testes & Build)
+          </a>
+        </div>
       </div>
-      <h1>Lista de Compras Móvel com SQLite e Arquitetura em Camadas</h1>
-      <p class="hero-lead">
-        Implementação integral e resiliente do tutorial da Aula 15 da disciplina de Desenvolvimento para Dispositivos Móveis.
-        Engenharia orientada a <em>offline-first</em>, separação estrita de responsabilidades, inversão de controle via Riverpod e canal de plataforma nativo em Kotlin.
-      </p>
-      <div class="hero-actions">
-        <a href="https://github.com/FelipeMadson/compras-ifb" class="btn-primary" target="_blank" rel="noopener">
-          Ver Código no GitHub
-        </a>
-        <a href="https://github.com/FelipeMadson/compras-ifb/releases/latest" class="btn-secondary" target="_blank" rel="noopener">
-          Baixar APK (Release)
-        </a>
+
+      <!-- SIMULADOR INTERATIVO -->
+      <div class="phone-wrapper" id="simulador">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          
+          <div class="phone-appbar">
+            <span class="appbar-title">Lista de Compras IFB</span>
+            <div class="appbar-actions">
+              <button class="appbar-icon" id="btnToggleOnline" title="Alternar modo online/offline">☁️</button>
+              <button class="appbar-icon" id="btnInfo" title="Sobre o app">ℹ️</button>
+            </div>
+          </div>
+
+          <div class="phone-offline-banner" id="bannerOffline" style="display: none;">
+            <span>⚠️</span>
+            <span>Sem conexão. Salvo no SQLite local.</span>
+          </div>
+
+          <div class="phone-content" id="listContent">
+            <div class="sim-progress-card">
+              <div class="sim-progress-header">
+                <span style="color: #14b8a6;">Progresso das Compras</span>
+                <span id="progressRatio" style="color: #cbd5e1;">1 de 4 itens</span>
+              </div>
+              <div class="sim-bar-bg">
+                <div class="sim-bar-fill" id="progressBar" style="width: 25%;"></div>
+              </div>
+            </div>
+
+            <div class="sim-list" id="itemsContainer">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+          </div>
+
+          <button class="sim-fab" id="btnAddItem">
+            <span>+</span>
+            <span>Novo item</span>
+          </button>
+        </div>
       </div>
     </section>
 
+    <!-- ARQUITETURA -->
     <section id="arquitetura">
-      <div class="section-header">
-        <div class="section-eyebrow">Engenharia de Software</div>
-        <h2 class="section-title">Arquitetura em Camadas Desacoplada</h2>
-      </div>
-
-      <div class="arch-grid">
+      <div class="section-eyebrow">Engenharia de Software</div>
+      <h2 class="section-title">Arquitetura em Camadas Desacoplada</h2>
+      <div class="grid-3">
         <div class="card">
           <div class="card-label">Camada 01</div>
           <h3 class="card-title">Domínio Puro</h3>
-          <p class="card-body">
-            Isolamento de qualquer biblioteca de interface ou banco. Entidades imutáveis com <code>copyWith</code> e regras de validação puras testadas com Dart puro.
+          <p class="card-desc">
+            Independência absoluta de UI e frameworks. Entidade imutável com <code>copyWith</code> e regras de validação testáveis com Dart puro.
           </p>
           <ul>
             <li><strong>Item:</strong> Entidade imutável com rastreio de sincronização.</li>
@@ -443,42 +698,39 @@
         <div class="card">
           <div class="card-label">Camada 02</div>
           <h3 class="card-title">Dados e Persistência</h3>
-          <p class="card-body">
-            SQLite relacional no aparelho, mapeador de registros e concorrência otimista com validação por timestamp.
+          <p class="card-desc">
+            SQLite relacional atômico no aparelho, concorrência otimista via timestamps e resiliência com jitter.
           </p>
           <ul>
-            <li><strong>BancoDeDados:</strong> Abertura singleton e metadados.</li>
-            <li><strong>Concorrência:</strong> Bloqueio otimista via <code>atualizado_em</code>.</li>
-            <li><strong>Resiliência:</strong> Backoff exponencial com full jitter.</li>
+            <li><strong>SQLite:</strong> Tabela com chave primária e CHECK.</li>
+            <li><strong>Concorrência:</strong> Verificação condicional em <code>atualizado_em</code>.</li>
+            <li><strong>Nova Tentativa:</strong> Exponential backoff com full jitter.</li>
           </ul>
         </div>
 
         <div class="card">
           <div class="card-label">Camada 03</div>
           <h3 class="card-title">Apresentação & Estado</h3>
-          <p class="card-body">
-            Composition Root centralizado com Riverpod. Gerenciamento de ciclo de vida assíncrono via <code>AsyncValue</code> e roteamento com <code>GoRouter</code>.
+          <p class="card-desc">
+            Composition Root com Riverpod, rotas declarativas e canal de plataforma Kotlin nativo.
           </p>
           <ul>
-            <li><strong>Providers:</strong> Injeção sem geração de código.</li>
+            <li><strong>Riverpod:</strong> AsyncNotifier com reatividade seletiva.</li>
             <li><strong>Deep Linking:</strong> Esquema <code>compras://app/item/:id</code>.</li>
-            <li><strong>Acessibilidade:</strong> WCAG, Semantics e Breakpoints M3.</li>
+            <li><strong>Platform Channel:</strong> Bateria, modelo e OS via Kotlin.</li>
           </ul>
         </div>
       </div>
     </section>
 
+    <!-- BANCO SQLITE -->
     <section id="sqlite">
-      <div class="section-header">
-        <div class="section-eyebrow">Camada Relacional</div>
-        <h2 class="section-title">Esquema do Banco SQLite e Concorrência</h2>
-      </div>
-
-      <p style="color: var(--text-muted); max-width: 800px; margin-bottom: 1.5rem;">
-        Em substituição ao <code>shared_preferences</code>, a tabela relacional assegura atomicidade de transações, consultas indexadas por registros pendentes e restrição no motor via <code>CHECK</code> como defesa em profundidade.
+      <div class="section-eyebrow">Persistência Relacional</div>
+      <h2 class="section-title">Esquema SQLite e Integridade</h2>
+      <p style="color: var(--text-muted); max-width: 800px;">
+        Em substituição ao <code>shared_preferences</code>, a tabela relacional assegura isolamento atômico, índice dedicado para consultas de sincronização e integridade por restrição <code>CHECK</code> em nível de engine.
       </p>
-
-      <div class="code-block">
+      <div class="code-box">
 CREATE TABLE itens (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   nome          TEXT    NOT NULL,
@@ -495,88 +747,139 @@ CREATE INDEX idx_itens_sincronizado ON itens (sincronizado);
       </div>
     </section>
 
+    <!-- TESTES AUTOMATIZADOS -->
     <section id="testes">
-      <div class="section-header">
-        <div class="section-eyebrow">Confiabilidade</div>
-        <h2 class="section-title">Cobertura de Testes Automatizados</h2>
-      </div>
-
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Nível</th>
-              <th>Arquivo de Teste</th>
-              <th>Alvo de Verificação</th>
-              <th>Dependência</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Unidade</strong></td>
-              <td><code>regras_item_test.dart</code></td>
-              <td>Validações de nome, cardinalidade, ordenação e resumo</td>
-              <td>Dart Puro</td>
-            </tr>
-            <tr>
-              <td><strong>Unidade</strong></td>
-              <td><code>nova_tentativa_test.dart</code></td>
-              <td>Backoff exponencial com jitter e filtro de falhas</td>
-              <td>Dart Puro</td>
-            </tr>
-            <tr>
-              <td><strong>Integração</strong></td>
-              <td><code>item_repository_sqlite_test.dart</code></td>
-              <td>SQL real: inserção, leitura, exclusão e concorrência otimista</td>
-              <td>SQLite FFI em memória</td>
-            </tr>
-            <tr>
-              <td><strong>Interface</strong></td>
-              <td><code>fluxo_da_lista_test.dart</code></td>
-              <td>Navegação, validação de formulário e persistência mockada</td>
-              <td>Widget Tester</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="section-eyebrow">Qualidade e Verificação</div>
+      <h2 class="section-title">Suíte de Testes Automatizados</h2>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-label">Unidade (Domínio)</div>
+          <h3 class="card-title">regras_item_test.dart</h3>
+          <p class="card-desc">Validações de nome, cardinalidade [1, 99], ordenação semântica e métricas consolidadas.</p>
+        </div>
+        <div class="card">
+          <div class="card-label">Unidade (Dados)</div>
+          <h3 class="card-title">nova_tentativa_test.dart</h3>
+          <p class="card-desc">Verificação de repetição diante de FalhaTransitoria até o sucesso ou teto máximo com jitter.</p>
+        </div>
+        <div class="card">
+          <div class="card-label">Integração (SQLite)</div>
+          <h3 class="card-title">item_repository_sqlite_test.dart</h3>
+          <p class="card-desc">Testes sobre motor SQLite real em memória (FFI) sem emulador: inserção, exclusão e bloqueio otimista.</p>
+        </div>
       </div>
     </section>
 
-    <section id="instalacao">
-      <div class="section-header">
-        <div class="section-eyebrow">Distribuição</div>
-        <h2 class="section-title">Instalação e Teste no Android</h2>
-      </div>
+    <!-- DOWNLOAD E DISTRIBUIÇÃO -->
+    <section id="download">
+      <div class="section-eyebrow">Distribuição Oficial</div>
+      <h2 class="section-title">Como Baixar e Instalar o APK</h2>
+      <div class="code-box">
+# Instalação direta no aparelho ou emulador via terminal:
+adb install -r app-release.apk
 
-      <div class="code-block">
-# 1. Compilação do APK de Produção (Universal)
-flutter build apk --release
-
-# 2. Instalação Direta via ADB no Aparelho ou Emulador
-adb install -r build/app/outputs/flutter-apk/app-release.apk
-
-# 3. Teste de Abertura por Ligação Profunda (Deep Link)
+# Teste de abertura direta por ligação profunda (Deep Link):
 adb shell am start -W -a android.intent.action.VIEW -d "compras://app/item/1" br.edu.ifb.felipemadison.compras
       </div>
     </section>
 
+    <!-- CARTÃO DO AUTOR -->
     <section>
-      <div class="profile-card">
-        <div class="profile-info">
+      <div class="author-card">
+        <div class="author-left">
           <div class="section-eyebrow" style="color: var(--primary);">Autoria Acadêmica</div>
           <h3>Felipe Madison da Silva Veloso</h3>
           <p>Matrícula Institucional: <strong>69815</strong> • Curso Superior de Tecnologia em Sistemas para Internet</p>
           <p>Instituto Federal de Educação, Ciência e Tecnologia de Brasília (IFB) — Campus Brasília</p>
+          <p style="margin-top: 4px; font-size: 0.85rem; color: #64748b;">Docente Responsável: Prof. Me. Cláudio Ulhoa</p>
         </div>
         <div>
-          <a href="https://github.com/FelipeMadson" class="btn-secondary" target="_blank" rel="noopener">Perfil GitHub</a>
+          <a href="https://github.com/FelipeMadson" class="btn-secondary" target="_blank" rel="noopener">
+            Ver Perfil no GitHub
+          </a>
         </div>
       </div>
     </section>
   </main>
 
   <footer>
-    <p>Projeto acadêmico desenvolvido para a disciplina DPDMV 2026/2 • IFB Campus Brasília • Docente: Cláudio Ulhoa</p>
+    <p>Projeto acadêmico desenvolvido para a disciplina DPDMV 2026/2 • IFB Campus Brasília • 2026</p>
   </footer>
 
+  <!-- SCRIPT DO SIMULADOR INTERATIVO -->
+  <script>
+    const items = [
+      { id: 1, name: 'Alface Crespa', cat: 'Hortifrúti', qty: 2, bought: false },
+      { id: 2, name: 'Arroz Integral', cat: 'Mercearia', qty: 1, bought: false },
+      { id: 3, name: 'Feijão Carioca', cat: 'Mercearia', qty: 2, bought: false },
+      { id: 4, name: 'Sabão em Pó', cat: 'Limpeza', qty: 1, bought: true }
+    ];
+
+    let isOnline = true;
+
+    function renderList() {
+      const container = document.getElementById('itemsContainer');
+      container.innerHTML = '';
+
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'sim-item' + (item.bought ? ' bought' : '');
+        div.onclick = () => toggleBought(item.id);
+
+        div.innerHTML = `
+          <div class="sim-checkbox">${item.bought ? '✓' : ''}</div>
+          <div class="sim-item-info">
+            <div class="sim-item-name">${item.name}</div>
+            <div class="sim-item-sub">${item.cat} • ${item.qty} un.</div>
+          </div>
+          <div class="sim-item-status" title="${isOnline ? 'Sincronizado' : 'Aguardando sincronização'}">
+            ${isOnline ? '☁️' : '⏳'}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      updateProgress();
+    }
+
+    function toggleBought(id) {
+      const item = items.find(i => i.id === id);
+      if (item) {
+        item.bought = !item.bought;
+        renderList();
+      }
+    }
+
+    function updateProgress() {
+      const total = items.length;
+      const bought = items.filter(i => i.bought).length;
+      const ratio = total === 0 ? 0 : (bought / total) * 100;
+
+      document.getElementById('progressRatio').innerText = `${bought} de ${total} itens`;
+      document.getElementById('progressBar').style.width = `${ratio}%`;
+    }
+
+    document.getElementById('btnToggleOnline').onclick = () => {
+      isOnline = !isOnline;
+      const banner = document.getElementById('bannerOffline');
+      banner.style.display = isOnline ? 'none' : 'flex';
+      renderList();
+    };
+
+    document.getElementById('btnInfo').onclick = () => {
+      alert("Compras IFB (v1.0.0)\n\nDiscente: Felipe Madison da Silva Veloso (Matrícula: 69815)\nCurso: TSI IFB CBRA\nDocente: Cláudio Ulhoa\n\nPersistência: SQLite relacional\nArquitetura: Domínio puro, Dados e Riverpod M3.");
+    };
+
+    document.getElementById('btnAddItem').onclick = () => {
+      const name = prompt("Nome do novo item para a lista de compras:");
+      if (name && name.trim().length >= 2) {
+        const nextId = items.length ? Math.max(...items.map(i => i.id)) + 1 : 1;
+        items.unshift({ id: nextId, name: name.trim(), cat: 'Mercearia', qty: 1, bought: false });
+        renderList();
+      }
+    };
+
+    renderList();
+  </script>
 </body>
 </html>
