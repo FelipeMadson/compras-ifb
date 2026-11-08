@@ -33,7 +33,7 @@ class CartaoItem extends ConsumerWidget {
         margin: EdgeInsets.zero,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          side: BorderSide(color: cores.outlineVariant.withOpacity(0.5)),
+          side: BorderSide(color: cores.outlineVariant),
           borderRadius: BorderRadius.circular(12),
         ),
         child: ListTile(

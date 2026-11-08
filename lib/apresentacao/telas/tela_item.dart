@@ -187,7 +187,7 @@ class _FormularioItemState extends ConsumerState<FormularioItem> {
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: _categoria,
+                      initialValue: _categoria,
                       decoration: const InputDecoration(
                         labelText: 'Categoria',
                         border: OutlineInputBorder(),

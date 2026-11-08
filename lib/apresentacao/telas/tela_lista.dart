@@ -153,7 +153,7 @@ class _CabecalhoResumo extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Card(
         elevation: 0,
-        color: tema.colorScheme.surfaceVariant.withOpacity(0.4),
+        color: tema.colorScheme.surfaceContainerHighest,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(

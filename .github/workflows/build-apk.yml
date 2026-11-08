@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configurar Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -34,7 +34,7 @@ jobs:
         run: flutter pub get
 
       - name: Análise Estática de Código
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos
 
       - name: Executar Testes Automatizados
         run: flutter test

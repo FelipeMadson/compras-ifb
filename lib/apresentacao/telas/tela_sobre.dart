@@ -93,9 +93,9 @@ class TelaSobre extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Card(
                   elevation: 0,
-                  color: cores.surfaceVariant.withOpacity(0.35),
+                  color: cores.surfaceContainerHighest,
                   shape: RoundedRectangleBorder(
-                    side: BorderSide(color: cores.outlineVariant.withOpacity(0.5)),
+                    side: BorderSide(color: cores.outlineVariant),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
@@ -146,9 +146,9 @@ class TelaSobre extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Card(
                   elevation: 0,
-                  color: cores.surfaceVariant.withOpacity(0.35),
+                  color: cores.surfaceContainerHighest,
                   shape: RoundedRectangleBorder(
-                    side: BorderSide(color: cores.outlineVariant.withOpacity(0.5)),
+                    side: BorderSide(color: cores.outlineVariant),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
