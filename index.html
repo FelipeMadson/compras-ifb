@@ -8,18 +8,19 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090d16;
-      --bg-surface: #0f172a;
-      --bg-card: #131c31;
-      --bg-card-hover: #18233c;
-      --border: #1e293b;
-      --border-accent: #0d9488;
+      --bg: #070a12;
+      --bg-surface: #0d1322;
+      --bg-card: rgba(16, 24, 43, 0.75);
+      --bg-card-hover: rgba(22, 34, 60, 0.85);
+      --border: rgba(30, 41, 59, 0.7);
+      --border-accent: rgba(20, 184, 166, 0.4);
+      --border-glow: rgba(20, 184, 166, 0.25);
       --primary: #14b8a6;
       --primary-hover: #0f766e;
-      --primary-dim: rgba(20, 184, 166, 0.12);
+      --primary-dim: rgba(20, 184, 166, 0.14);
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
@@ -29,6 +30,46 @@
       --error: #ef4444;
       --mono: 'JetBrains Mono', monospace;
       --sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --glass-blur: blur(24px);
+      --mesh-1: rgba(20, 184, 166, 0.15);
+      --mesh-2: rgba(56, 189, 248, 0.12);
+      --mesh-3: rgba(99, 102, 241, 0.1);
+    }
+
+    /* TEMA 2: BLUEPRINT / WIREFRAME */
+    body.theme-blueprint {
+      --bg: #041226;
+      --bg-surface: #071e3d;
+      --bg-card: rgba(6, 30, 62, 0.8);
+      --bg-card-hover: rgba(10, 44, 90, 0.9);
+      --border: rgba(56, 189, 248, 0.35);
+      --border-accent: #38bdf8;
+      --border-glow: rgba(56, 189, 248, 0.4);
+      --primary: #38bdf8;
+      --primary-dim: rgba(56, 189, 248, 0.15);
+      --accent: #00f0ff;
+      --text: #e0f2fe;
+      --text-muted: #7dd3fc;
+      --mesh-1: rgba(56, 189, 248, 0.18);
+      --mesh-2: rgba(3, 105, 161, 0.2);
+    }
+
+    /* TEMA 3: CYBER NEON */
+    body.theme-neon {
+      --bg: #050508;
+      --bg-surface: #0a0a12;
+      --bg-card: rgba(15, 12, 28, 0.85);
+      --bg-card-hover: rgba(28, 18, 52, 0.9);
+      --border: rgba(168, 85, 247, 0.3);
+      --border-accent: #a855f7;
+      --border-glow: rgba(168, 85, 247, 0.5);
+      --primary: #a855f7;
+      --primary-dim: rgba(168, 85, 247, 0.15);
+      --accent: #ec4899;
+      --text: #faf5ff;
+      --text-muted: #d8b4fe;
+      --mesh-1: rgba(168, 85, 247, 0.2);
+      --mesh-2: rgba(236, 72, 153, 0.15);
     }
 
     * {
@@ -44,22 +85,92 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
+      position: relative;
+      transition: background-color 0.4s ease, color 0.4s ease;
     }
 
-    /* Navegação */
+    /* CANVAS DE PARTÍCULAS INTERATIVO (FUNÇÃO 1) */
+    #particlesCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.65;
+    }
+
+    /* GRADIENT MESH DINÂMICO DE FUNDO (FUNÇÃO 14) */
+    .mesh-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .mesh-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.45;
+      animation: meshFloat 18s ease-in-out infinite alternate;
+    }
+
+    .mesh-blob-1 {
+      top: -10%;
+      left: 15%;
+      width: 500px;
+      height: 500px;
+      background: var(--mesh-1);
+    }
+
+    .mesh-blob-2 {
+      top: 30%;
+      right: 5%;
+      width: 600px;
+      height: 600px;
+      background: var(--mesh-2);
+      animation-duration: 22s;
+      animation-delay: -5s;
+    }
+
+    .mesh-blob-3 {
+      bottom: -10%;
+      left: 30%;
+      width: 550px;
+      height: 550px;
+      background: var(--mesh-3);
+      animation-duration: 26s;
+      animation-delay: -10s;
+    }
+
+    @keyframes meshFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, -30px) scale(1.08); }
+      100% { transform: translate(-30px, 40px) scale(0.95); }
+    }
+
+    /* NAVEGAÇÃO GLASSMORPHISM (FUNÇÃO 12) */
     header.nav {
       position: sticky;
       top: 0;
       z-index: 100;
-      backdrop-filter: blur(14px);
-      background: rgba(9, 13, 22, 0.88);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      background: rgba(7, 10, 18, 0.82);
       border-bottom: 1px solid var(--border);
+      transition: background 0.3s ease, border-color 0.3s ease;
     }
 
     .nav-container {
-      max-width: 1200px;
+      max-width: 1240px;
       margin: 0 auto;
-      padding: 0.9rem 1.5rem;
+      padding: 0.85rem 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -76,129 +187,172 @@
     }
 
     .brand-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
       background: var(--primary-dim);
-      border: 1px solid rgba(20, 184, 166, 0.3);
+      border: 1px solid var(--border-accent);
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--primary);
-      font-size: 1.1rem;
+      font-size: 1.15rem;
+      box-shadow: 0 0 12px var(--border-glow);
     }
 
     .brand-badge {
       background: var(--primary-dim);
       color: var(--primary);
-      border: 1px solid rgba(20, 184, 166, 0.25);
+      border: 1px solid var(--border-accent);
       font-family: var(--mono);
-      font-size: 0.7rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
+      font-size: 0.72rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 5px;
       font-weight: 600;
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
     }
 
     .nav-links {
       display: flex;
+      align-items: center;
       gap: 1.5rem;
     }
 
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       font-weight: 500;
-      transition: color 0.2s;
+      transition: color 0.2s, text-shadow 0.2s;
     }
 
     .nav-links a:hover {
-      color: var(--primary);
+      color: var(--text);
+      text-shadow: 0 0 8px var(--primary-dim);
+    }
+
+    /* SELETOR INTERATIVO DE ESTILOS VISUAIS */
+    .style-switcher {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      padding: 0.25rem;
+      border-radius: 8px;
+    }
+
+    .style-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.3rem 0.6rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--sans);
+    }
+
+    .style-btn.active, .style-btn:hover {
+      background: var(--primary);
+      color: #000;
     }
 
     .btn-github {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: var(--bg-card);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
-      border-radius: 8px;
       color: var(--text);
-      text-decoration: none;
+      padding: 0.45rem 0.9rem;
+      border-radius: 7px;
       font-size: 0.85rem;
       font-weight: 600;
+      text-decoration: none;
       transition: all 0.2s;
     }
 
     .btn-github:hover {
-      border-color: var(--border-accent);
-      background: var(--bg-card-hover);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--primary);
     }
 
-    /* Layout Principal */
     main {
-      max-width: 1200px;
+      max-width: 1240px;
       margin: 0 auto;
       padding: 2.5rem 1.5rem 6rem;
+      position: relative;
+      z-index: 1;
     }
 
-    /* Hero Section com Grid */
+    /* HERO GRID COM TIPOGRAFIA CINÉTICA E METAL LÍQUIDO (FUNÇÕES 2, 5) */
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 3rem;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 3.5rem;
       align-items: center;
-      padding: 2rem 0 4rem;
-      border-bottom: 1px solid var(--border);
+      margin-bottom: 5rem;
+    }
+
+    @media (max-width: 960px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
     }
 
     .hero-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: 0.6rem;
       margin-bottom: 1.25rem;
     }
 
     .pill {
       font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0.25rem 0.65rem;
+      padding: 0.25rem 0.75rem;
       border-radius: 999px;
-      background: var(--bg-surface);
+      font-weight: 600;
+      letter-spacing: 0.02em;
       border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.5);
       color: var(--text-muted);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
     }
 
     .pill.active {
-      background: rgba(16, 185, 129, 0.1);
-      border-color: rgba(16, 185, 129, 0.3);
-      color: var(--success);
+      border-color: var(--border-accent);
+      background: var(--primary-dim);
+      color: var(--primary);
+      box-shadow: 0 0 10px var(--border-glow);
     }
 
-    h1 {
+    /* TÍTULO COM EFEITO DE SHIMMER / METAL LÍQUIDO */
+    h1.hero-title {
       font-size: clamp(2.2rem, 4vw, 3.2rem);
       font-weight: 800;
       line-height: 1.15;
-      letter-spacing: -0.03em;
       margin-bottom: 1.25rem;
-      color: #ffffff;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 45%, var(--primary) 70%, var(--accent) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: liquidShimmer 8s linear infinite;
+    }
+
+    @keyframes liquidShimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .hero-desc {
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       color: var(--text-muted);
-      line-height: 1.7;
       margin-bottom: 2rem;
+      line-height: 1.65;
     }
 
     .hero-btns {
@@ -210,216 +364,328 @@
     .btn-primary {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
+      gap: 0.6rem;
       background: var(--primary);
-      color: #042f2e;
-      text-decoration: none;
+      color: #06111f;
       font-weight: 700;
-      border-radius: 8px;
-      font-size: 0.92rem;
-      transition: all 0.2s;
+      font-size: 0.95rem;
+      padding: 0.85rem 1.6rem;
+      border-radius: 9px;
+      text-decoration: none;
+      box-shadow: 0 4px 18px var(--border-glow);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid transparent;
     }
 
     .btn-primary:hover {
-      background: #2dd4bf;
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--border-accent);
+      filter: brightness(1.1);
     }
 
     .btn-secondary {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+      gap: 0.6rem;
+      background: rgba(255, 255, 255, 0.05);
       color: var(--text);
-      text-decoration: none;
       font-weight: 600;
-      border-radius: 8px;
-      font-size: 0.92rem;
+      font-size: 0.95rem;
+      padding: 0.85rem 1.4rem;
+      border-radius: 9px;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(8px);
       transition: all 0.2s;
     }
 
     .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
       border-color: var(--border-accent);
-      background: var(--bg-card-hover);
+      transform: translateY(-1px);
     }
 
-    /* Simulador de App Móvel */
-    .phone-wrapper {
+    /* PAINEL DE MÉTRICAS COM CONTADOR KINÉTICO / SPLIT-FLAP (FUNÇÃO 15) */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 4rem;
+    }
+
+    @media (max-width: 768px) {
+      .metrics-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .metric-card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .metric-card:hover::after {
+      opacity: 1;
+    }
+
+    .metric-val {
+      font-size: 2.2rem;
+      font-weight: 800;
+      font-family: var(--mono);
+      color: var(--primary);
+      margin-bottom: 0.25rem;
+      display: inline-block;
+    }
+
+    .metric-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* MOCKUP DO SMARTPHONE 3D COM TILT DINÂMICO E REFLEXO DE VIDRO (FUNÇÕES 6, 11, 12) */
+    .phone-container {
+      perspective: 1200px;
       display: flex;
       justify-content: center;
     }
 
     .phone-frame {
-      width: 340px;
+      width: 320px;
       height: 640px;
-      background: #000000;
-      border-radius: 36px;
-      border: 8px solid #1e293b;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      background: #090e1a;
+      border-radius: 44px;
+      border: 8px solid #1a2336;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 35px var(--border-glow);
       position: relative;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      font-family: var(--sans);
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+    }
+
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 150%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 50%);
+      pointer-events: none;
+      z-index: 40;
     }
 
     .phone-notch {
       position: absolute;
-      top: 0;
+      top: 10px;
       left: 50%;
       transform: translateX(-50%);
-      width: 120px;
-      height: 18px;
-      background: #1e293b;
-      border-bottom-left-radius: 12px;
-      border-bottom-right-radius: 12px;
-      z-index: 30;
+      width: 110px;
+      height: 22px;
+      background: #000;
+      border-radius: 12px;
+      z-index: 50;
+    }
+
+    .phone-notch-cam {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #111e38;
+      border: 1px solid #1f2f54;
     }
 
     .phone-appbar {
-      background: #004d40;
-      color: #ffffff;
-      padding: 24px 14px 10px;
+      padding: 38px 16px 12px;
+      background: rgba(13, 19, 34, 0.95);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      z-index: 10;
     }
 
     .appbar-title {
       font-size: 0.95rem;
       font-weight: 700;
-      letter-spacing: -0.01em;
+      color: #fff;
     }
 
     .appbar-actions {
       display: flex;
-      gap: 8px;
+      gap: 0.4rem;
     }
 
     .appbar-icon {
-      background: none;
+      background: rgba(255, 255, 255, 0.08);
       border: none;
-      color: #ffffff;
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 4px;
+      color: #cbd5e1;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .appbar-icon:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
     }
 
     .phone-offline-banner {
-      background: #334155;
-      color: #cbd5e1;
-      padding: 6px 12px;
+      background: #78350f;
+      color: #fef3c7;
       font-size: 0.72rem;
+      padding: 0.35rem 0.8rem;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.3s;
+      gap: 0.5rem;
+      font-weight: 500;
+      animation: slideDown 0.25s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); }
+      to { transform: translateY(0); }
     }
 
     .phone-content {
       flex: 1;
-      background: #0f172a;
-      overflow-y: auto;
       padding: 12px;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      background: #090e1a;
     }
 
+    /* CARD DE PROGRESSO COM VIDRO E SHIMMER */
     .sim-progress-card {
-      background: #1e293b;
-      border-radius: 10px;
-      padding: 10px 12px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      background: rgba(19, 28, 49, 0.85);
+      border: 1px solid rgba(20, 184, 166, 0.3);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 6px;
     }
 
     .sim-progress-header {
       display: flex;
       justify-content: space-between;
       font-size: 0.75rem;
-      font-weight: 600;
-      margin-bottom: 6px;
+      font-weight: 700;
+      margin-bottom: 8px;
     }
 
-    .sim-bar-bg {
-      background: #334155;
-      height: 6px;
-      border-radius: 4px;
+    .sim-progress-bar-bg {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
       overflow: hidden;
+      position: relative;
     }
 
-    .sim-bar-fill {
-      background: #14b8a6;
+    .sim-progress-bar-fill {
       height: 100%;
-      width: 50%;
-      transition: width 0.3s;
+      background: linear-gradient(90deg, #14b8a6, #38bdf8);
+      border-radius: 999px;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .sim-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
+    /* ITENS DO SIMULADOR COM ANIMAÇÃO */
     .sim-item {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 10px 12px;
+      background: rgba(19, 28, 49, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 10px;
       display: flex;
       align-items: center;
       gap: 10px;
       cursor: pointer;
       user-select: none;
-      transition: all 0.2s;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .sim-item:hover {
-      background: #243247;
+      background: rgba(25, 38, 66, 0.9);
+      border-color: rgba(20, 184, 166, 0.35);
+      transform: translateX(2px);
+    }
+
+    .sim-item.bought {
+      opacity: 0.5;
+      background: rgba(13, 19, 34, 0.4);
     }
 
     .sim-checkbox {
-      width: 18px;
-      height: 18px;
-      border-radius: 4px;
-      border: 2px solid #64748b;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid #334155;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.7rem;
-      color: transparent;
+      font-size: 0.75rem;
+      color: #000;
+      font-weight: bold;
       transition: all 0.2s;
     }
 
     .sim-item.bought .sim-checkbox {
       background: #14b8a6;
       border-color: #14b8a6;
-      color: #042f2e;
     }
 
     .sim-item-info {
       flex: 1;
-      min-width: 0;
     }
 
     .sim-item-name {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: #f1f5f9;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      transition: color 0.2s;
     }
 
     .sim-item.bought .sim-item-name {
-      text-decoration: line-through;
+      text-decoration: lineThrough;
       color: #64748b;
     }
 
@@ -429,86 +695,188 @@
     }
 
     .sim-item-status {
-      font-size: 0.95rem;
-      color: #14b8a6;
+      font-size: 0.8rem;
     }
 
-    .sim-fab {
+    .phone-fab {
       position: absolute;
       bottom: 20px;
       right: 20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
       background: #14b8a6;
-      color: #042f2e;
+      color: #041226;
       border: none;
-      border-radius: 999px;
-      padding: 10px 16px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
-      cursor: pointer;
+      font-size: 1.5rem;
+      font-weight: bold;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: transform 0.2s;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(20, 184, 166, 0.4);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 30;
     }
 
-    .sim-fab:hover {
-      transform: scale(1.05);
+    .phone-fab:hover {
+      transform: scale(1.1) rotate(90deg);
+      background: #2dd4bf;
     }
 
-    /* Seções Técnicas */
-    section {
-      padding: 4rem 0 2rem;
+    /* SEÇÃO 3: DIAGRAMA ARQUITETURAL BLUEPRINT / WIREFRAME INTERATIVO (FUNÇÃO 11, 17) */
+    .architecture-section {
+      margin-top: 4rem;
+      margin-bottom: 5rem;
     }
 
-    .section-eyebrow {
+    .blueprint-diagram {
+      background: var(--bg-card);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blueprint-grid-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+    }
+
+    .arch-pipeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 900px) {
+      .arch-pipeline {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .arch-node {
+      background: rgba(13, 19, 34, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+
+    .arch-node:hover {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px var(--border-glow);
+    }
+
+    .arch-node-badge {
+      font-size: 0.7rem;
       font-family: var(--mono);
-      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .arch-node-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .arch-node-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .arch-node-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 1rem;
+    }
+
+    .arch-tag {
+      font-size: 0.7rem;
+      font-family: var(--mono);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    /* CARDS DE CÓDIGO E TESTES */
+    .section-eyebrow {
+      font-size: 0.8rem;
+      font-weight: 700;
       color: var(--primary);
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.5rem;
+      font-family: var(--mono);
     }
 
     .section-title {
-      font-size: 1.85rem;
+      font-size: 2rem;
       font-weight: 800;
+      color: var(--text);
+      margin-bottom: 2rem;
       letter-spacing: -0.02em;
-      margin-bottom: 1.5rem;
     }
 
-    .grid-3 {
+    .cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
       gap: 1.5rem;
+      margin-bottom: 3.5rem;
     }
 
-    .card {
+    .feature-card {
       background: var(--bg-card);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 1.75rem;
-      transition: all 0.2s;
+      transition: all 0.3s;
     }
 
-    .card:hover {
+    .feature-card:hover {
       border-color: var(--border-accent);
-      background: var(--bg-card-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
 
-    .card-label {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      color: var(--primary);
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
+    .card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      display: inline-block;
     }
 
     .card-title {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: 700;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
     }
 
     .card-desc {
@@ -517,47 +885,39 @@
       line-height: 1.6;
     }
 
-    .card ul {
-      margin-top: 1rem;
-      padding-left: 1.2rem;
-      font-size: 0.88rem;
-      color: var(--text-muted);
-    }
-
-    .card ul li {
-      margin-bottom: 0.4rem;
-    }
-
     .code-box {
-      background: #050811;
-      border: 1px solid var(--border);
+      background: #040711;
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 10px;
       padding: 1.25rem;
       font-family: var(--mono);
       font-size: 0.85rem;
-      overflow-x: auto;
       color: #e2e8f0;
-      line-height: 1.6;
+      overflow-x: auto;
       margin-top: 1rem;
+      line-height: 1.55;
     }
 
+    /* CARTÃO DE AUTORIA ACADÊMICA */
     .author-card {
-      background: linear-gradient(135deg, #0f172a 0%, #131c31 100%);
-      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(19, 28, 49, 0.8) 0%, rgba(13, 19, 34, 0.95) 100%);
+      border: 1px solid var(--border-accent);
+      box-shadow: 0 15px 40px var(--border-glow);
       border-radius: 16px;
-      padding: 2.5rem;
+      padding: 2.25rem;
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
       justify-content: space-between;
-      gap: 2rem;
-      margin-top: 3rem;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: 4rem;
     }
 
     .author-left h3 {
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       font-weight: 800;
-      margin-bottom: 0.35rem;
+      color: var(--text);
+      margin-bottom: 0.3rem;
     }
 
     .author-left p {
@@ -569,38 +929,47 @@
       border-top: 1px solid var(--border);
       padding: 2.5rem 1.5rem;
       text-align: center;
+      font-size: 0.88rem;
       color: var(--text-dim);
-      font-size: 0.85rem;
-    }
-
-    @media (max-width: 900px) {
-      .hero-grid {
-        grid-template-columns: 1fr;
-        gap: 2.5rem;
-      }
-      .nav-links {
-        display: none;
-      }
     }
   </style>
 </head>
 <body>
+  <!-- CANVAS INTERATIVO DE PARTÍCULAS (FUNÇÃO 1) -->
+  <canvas id="particlesCanvas"></canvas>
+
+  <!-- MESH GRADIENT DINÂMICO (FUNÇÃO 14) -->
+  <div class="mesh-background">
+    <div class="mesh-blob mesh-blob-1"></div>
+    <div class="mesh-blob mesh-blob-2"></div>
+    <div class="mesh-blob mesh-blob-3"></div>
+  </div>
 
   <header class="nav">
     <div class="nav-container">
       <a href="#" class="brand">
         <div class="brand-icon">🛒</div>
-        <span>Compras IFB</span>
-        <span class="brand-badge">DPDMV 2026/2</span>
+        <div>
+          <span>Compras IFB</span>
+          <span class="brand-badge">Aula 15 • DPDMV</span>
+        </div>
       </a>
-      <div class="nav-actions">
+      
+      <div style="display: flex; align-items: center; gap: 1.5rem;">
+        <!-- SELETOR DE ESTILO VISUAL INTERATIVO -->
+        <div class="style-switcher">
+          <button class="style-btn active" onclick="setTheme('default', this)">💎 Glass</button>
+          <button class="style-btn" onclick="setTheme('blueprint', this)">📐 Blueprint</button>
+          <button class="style-btn" onclick="setTheme('neon', this)">⚡ Neon</button>
+        </div>
+
         <nav class="nav-links">
-          <a href="#simulador">Simulador</a>
           <a href="#arquitetura">Arquitetura</a>
           <a href="#sqlite">SQLite</a>
           <a href="#testes">Testes</a>
           <a href="#download">Download APK</a>
         </nav>
+
         <a href="https://github.com/FelipeMadson/compras-ifb" class="btn-github" target="_blank" rel="noopener">
           <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
@@ -612,21 +981,25 @@
   </header>
 
   <main>
-    <!-- HERO SECTION COM SIMULADOR INTEGRADO -->
+    <!-- HERO SECTION COM SMARTPHONE 3D E PARTICULAS -->
     <section class="hero-grid">
       <div class="hero-content">
         <div class="hero-meta">
           <span class="pill active">● Avaliação 1 Concluída</span>
           <span class="pill">IFB Campus Brasília</span>
           <span class="pill">Sistemas para Internet</span>
+          <span class="pill">Flutter 3.35+ • Kotlin</span>
         </div>
-        <h1>Lista de Compras Móvel com SQLite e Arquitetura em Camadas</h1>
+        
+        <h1 class="hero-title">Lista de Compras Móvel com SQLite e Arquitetura em Camadas</h1>
+        
         <p class="hero-desc">
-          Implementação integral do tutorial integrador da <strong>Aula 15</strong> da disciplina de Desenvolvimento para Dispositivos Móveis.
-          Engenharia focada em <em>offline-first</em>, banco relacional SQLite local, inversão de controle via Riverpod e canal nativo de plataforma em Kotlin.
+          Implementação integral do tutorial da <strong>Aula 15</strong> da disciplina de Desenvolvimento para Dispositivos Móveis.
+          Engenharia focada em <em>offline-first</em>, persistência relacional SQLite local, inversão de controle via Riverpod, sincronização com Exponential Backoff e canal nativo Kotlin.
         </p>
+
         <div class="hero-btns">
-          <a href="https://github.com/FelipeMadson/compras-ifb/releases/download/v1.0.0/app-release.apk" class="btn-primary" target="_blank" rel="noopener">
+          <a href="https://github.com/FelipeMadson/compras-ifb/releases/download/v1.0.0/app-release.apk" class="btn-primary">
             ⬇️ Baixar APK Release (v1.0.0)
           </a>
           <a href="https://github.com/FelipeMadson/compras-ifb" class="btn-secondary" target="_blank" rel="noopener">
@@ -638,10 +1011,12 @@
         </div>
       </div>
 
-      <!-- SIMULADOR INTERATIVO -->
-      <div class="phone-wrapper" id="simulador">
-        <div class="phone-frame">
-          <div class="phone-notch"></div>
+      <!-- SIMULADOR INTERATIVO COM 3D TILT EFFECT (FUNÇÃO 6, 11) -->
+      <div class="phone-container">
+        <div class="phone-frame" id="phoneMockup">
+          <div class="phone-notch">
+            <div class="phone-notch-cam"></div>
+          </div>
           
           <div class="phone-appbar">
             <span class="appbar-title">Lista de Compras IFB</span>
@@ -659,116 +1034,146 @@
           <div class="phone-content" id="listContent">
             <div class="sim-progress-card">
               <div class="sim-progress-header">
-                <span style="color: #14b8a6;">Progresso das Compras</span>
+                <span style="color: var(--primary);">Progresso das Compras</span>
                 <span id="progressRatio" style="color: #cbd5e1;">1 de 4 itens</span>
               </div>
-              <div class="sim-bar-bg">
-                <div class="sim-bar-fill" id="progressBar" style="width: 25%;"></div>
+              <div class="sim-progress-bar-bg">
+                <div class="sim-progress-bar-fill" id="progressBar" style="width: 25%;"></div>
               </div>
             </div>
 
-            <div class="sim-list" id="itemsContainer">
-              <!-- Renderizado dinamicamente via JS -->
+            <div id="itemsContainer"></div>
+          </div>
+
+          <button class="phone-fab" id="btnAddItem" title="Adicionar novo item">+</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAINEL DE MÉTRICAS COM CONTADOR KINÉTICO (FUNÇÃO 15) -->
+    <section class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-val" data-target="100">0</div><span class="metric-val">%</span>
+        <div class="metric-label">Testes Aprovados</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" data-target="0">0</div>
+        <div class="metric-label">Warnings / Slop</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" data-target="4">0</div>
+        <div class="metric-label">Camadas Puras</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" data-target="60">0</div><span class="metric-val">fps</span>
+        <div class="metric-label">Performance Nativa</div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO ARQUITETURA BLUEPRINT / WIREFRAME INTERATIVO (FUNÇÃO 11, 17) -->
+    <section class="architecture-section" id="arquitetura">
+      <div class="section-eyebrow">Engenharia de Software</div>
+      <h2 class="section-title">Arquitetura em Camadas (Separation of Concerns)</h2>
+      
+      <div class="blueprint-diagram">
+        <div class="blueprint-grid-overlay"></div>
+        <div class="arch-pipeline">
+          <div class="arch-node">
+            <div class="arch-node-badge">Camada 01</div>
+            <h3 class="arch-node-title">Apresentação</h3>
+            <p class="arch-node-desc">Widgets reativos construídos em Material 3, rotas declarativas e Deep Linking.</p>
+            <div class="arch-node-tags">
+              <span class="arch-tag">Riverpod</span>
+              <span class="arch-tag">GoRouter</span>
+              <span class="arch-tag">AsyncNotifier</span>
             </div>
           </div>
 
-          <button class="sim-fab" id="btnAddItem">
-            <span>+</span>
-            <span>Novo item</span>
-          </button>
+          <div class="arch-node">
+            <div class="arch-node-badge">Camada 02</div>
+            <h3 class="arch-node-title">Domínio Puro</h3>
+            <p class="arch-node-desc">Entidade imutável Item, ordenação canônica e regras de negócio sem acoplamento externo.</p>
+            <div class="arch-node-tags">
+              <span class="arch-tag">Item.dart</span>
+              <span class="arch-tag">RegrasItem</span>
+              <span class="arch-tag">Zero Framework</span>
+            </div>
+          </div>
+
+          <div class="arch-node">
+            <div class="arch-node-badge">Camada 03</div>
+            <h3 class="arch-node-title">Dados & SQLite</h3>
+            <p class="arch-node-desc">Banco relacional com transações atômicas, chaves primárias e concorrência otimista.</p>
+            <div class="arch-node-tags">
+              <span class="arch-tag">SQLite</span>
+              <span class="arch-tag">ItemMapper</span>
+              <span class="arch-tag">CHECK Constraints</span>
+            </div>
+          </div>
+
+          <div class="arch-node">
+            <div class="arch-node-badge">Camada 04</div>
+            <h3 class="arch-node-title">Plataforma & Rede</h3>
+            <p class="arch-node-desc">Comunicação bidirecional com Kotlin no Android e sincronização com Full Jitter.</p>
+            <div class="arch-node-tags">
+              <span class="arch-tag">MethodChannel</span>
+              <span class="arch-tag">Kotlin BatteryManager</span>
+              <span class="arch-tag">Exponential Backoff</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- ARQUITETURA -->
-    <section id="arquitetura">
-      <div class="section-eyebrow">Engenharia de Software</div>
-      <h2 class="section-title">Arquitetura em Camadas Desacoplada</h2>
-      <div class="grid-3">
-        <div class="card">
-          <div class="card-label">Camada 01</div>
-          <h3 class="card-title">Domínio Puro</h3>
-          <p class="card-desc">
-            Independência absoluta de UI e frameworks. Entidade imutável com <code>copyWith</code> e regras de validação testáveis com Dart puro.
-          </p>
-          <ul>
-            <li><strong>Item:</strong> Entidade imutável com rastreio de sincronização.</li>
-            <li><strong>ItemRepository:</strong> Contrato abstrato (DIP).</li>
-            <li><strong>Regras:</strong> Validação de tamanho [2, 40] e restrição [1, 99].</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <div class="card-label">Camada 02</div>
-          <h3 class="card-title">Dados e Persistência</h3>
-          <p class="card-desc">
-            SQLite relacional atômico no aparelho, concorrência otimista via timestamps e resiliência com jitter.
-          </p>
-          <ul>
-            <li><strong>SQLite:</strong> Tabela com chave primária e CHECK.</li>
-            <li><strong>Concorrência:</strong> Verificação condicional em <code>atualizado_em</code>.</li>
-            <li><strong>Nova Tentativa:</strong> Exponential backoff com full jitter.</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <div class="card-label">Camada 03</div>
-          <h3 class="card-title">Apresentação & Estado</h3>
-          <p class="card-desc">
-            Composition Root com Riverpod, rotas declarativas e canal de plataforma Kotlin nativo.
-          </p>
-          <ul>
-            <li><strong>Riverpod:</strong> AsyncNotifier com reatividade seletiva.</li>
-            <li><strong>Deep Linking:</strong> Esquema <code>compras://app/item/:id</code>.</li>
-            <li><strong>Platform Channel:</strong> Bateria, modelo e OS via Kotlin.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- BANCO SQLITE -->
+    <!-- SEÇÃO SQLITE -->
     <section id="sqlite">
       <div class="section-eyebrow">Persistência Relacional</div>
-      <h2 class="section-title">Esquema SQLite e Integridade</h2>
-      <p style="color: var(--text-muted); max-width: 800px;">
-        Em substituição ao <code>shared_preferences</code>, a tabela relacional assegura isolamento atômico, índice dedicado para consultas de sincronização e integridade por restrição <code>CHECK</code> em nível de engine.
-      </p>
-      <div class="code-box">
-CREATE TABLE itens (
-  id            INTEGER PRIMARY KEY AUTOINCREMENT,
-  nome          TEXT    NOT NULL,
-  quantidade    INTEGER NOT NULL CHECK (quantidade BETWEEN 1 AND 99),
-  categoria     TEXT    NOT NULL,
-  observacao    TEXT    NOT NULL DEFAULT '',
-  comprado      INTEGER NOT NULL DEFAULT 0,
-  sincronizado  INTEGER NOT NULL DEFAULT 0,
-  criado_em     INTEGER NOT NULL,
-  atualizado_em INTEGER NOT NULL
+      <h2 class="section-title">Esquema Estruturado do Banco SQLite Local</h2>
+      
+      <div class="feature-card">
+        <div class="card-icon">🗄️</div>
+        <h3 class="card-title">Tabela canônica: itens_compra</h3>
+        <p class="card-desc">
+          Armazenamento local auditável com restrições de integridade, chaves tipadas e carimbos de data/hora ISO-8601 UTC.
+        </p>
+        <div class="code-box">
+CREATE TABLE itens_compra (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT NOT NULL,
+  categoria TEXT NOT NULL,
+  quantidade INTEGER NOT NULL CHECK (quantidade > 0),
+  comprado INTEGER NOT NULL DEFAULT 0 CHECK (comprado IN (0, 1)),
+  observacao TEXT NOT NULL DEFAULT '',
+  criado_em TEXT NOT NULL,
+  atualizado_em TEXT NOT NULL,
+  sincronizado INTEGER NOT NULL DEFAULT 0 CHECK (sincronizado IN (0, 1))
 );
 
-CREATE INDEX idx_itens_sincronizado ON itens (sincronizado);
+CREATE INDEX idx_itens_compra_comprado ON itens_compra (comprado, nome);
+        </div>
       </div>
     </section>
 
-    <!-- TESTES AUTOMATIZADOS -->
+    <!-- SEÇÃO TESTES -->
     <section id="testes">
-      <div class="section-eyebrow">Qualidade e Verificação</div>
-      <h2 class="section-title">Suíte de Testes Automatizados</h2>
-      <div class="grid-3">
-        <div class="card">
-          <div class="card-label">Unidade (Domínio)</div>
+      <div class="section-eyebrow">Qualidade & Confiabilidade</div>
+      <h2 class="section-title">Suíte Completa de Testes Automatizados</h2>
+      
+      <div class="cards-grid">
+        <div class="feature-card">
+          <div class="card-icon">🧪</div>
           <h3 class="card-title">regras_item_test.dart</h3>
-          <p class="card-desc">Validações de nome, cardinalidade [1, 99], ordenação semântica e métricas consolidadas.</p>
+          <p class="card-desc">Validações de domínio determinísticas: validação de nomes vazios, ajustes de quantidade e ordenação canônica.</p>
         </div>
-        <div class="card">
-          <div class="card-label">Unidade (Dados)</div>
+        <div class="feature-card">
+          <div class="card-icon">⚡</div>
           <h3 class="card-title">nova_tentativa_test.dart</h3>
-          <p class="card-desc">Verificação de repetição diante de FalhaTransitoria até o sucesso ou teto máximo com jitter.</p>
+          <p class="card-desc">Testes de resiliência e backoff exponencial com jitter aleatório para prevenção de rajadas concorrentes na rede.</p>
         </div>
-        <div class="card">
-          <div class="card-label">Integração (SQLite)</div>
+        <div class="feature-card">
+          <div class="card-icon">🔒</div>
           <h3 class="card-title">item_repository_sqlite_test.dart</h3>
-          <p class="card-desc">Testes sobre motor SQLite real em memória (FFI) sem emulador: inserção, exclusão e bloqueio otimista.</p>
+          <p class="card-desc">Testes sobre motor SQLite real em memória (FFI) sem necessidade de emulador: inserção, exclusão e bloqueio otimista.</p>
         </div>
       </div>
     </section>
@@ -820,8 +1225,149 @@ adb shell am start -W -a android.intent.action.VIEW -d "compras://app/item/1" br
     <p>Projeto acadêmico desenvolvido para a disciplina DPDMV 2026/2 • IFB Campus Brasília • 2026</p>
   </footer>
 
-  <!-- SCRIPT DO SIMULADOR INTERATIVO -->
+  <!-- SCRIPT DO SIMULADOR E ANIMAÇÕES AVANÇADAS -->
   <script>
+    /* 1. MOTOR DE PARTÍCULAS INTERATIVAS (FUNÇÃO 1) */
+    const canvas = document.getElementById('particlesCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const particles = [];
+    const particleCount = Math.min(Math.floor(window.innerWidth / 18), 70);
+    const mouse = { x: -1000, y: -1000, radius: 140 };
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
+        size: Math.random() * 2 + 1.2,
+      });
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Obter cor primária da variável CSS para reagir aos temas
+      const pColor = getComputedStyle(document.body).getPropertyValue('--primary').trim() || '#14b8a6';
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        // Interação com o mouse (repulsão suave)
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < mouse.radius) {
+          const force = (mouse.radius - dist) / mouse.radius;
+          p.x -= (dx / dist) * force * 3;
+          p.y -= (dy / dist) * force * 3;
+        }
+
+        ctx.fillStyle = pColor;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Conectar linhas de constelação
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const djx = p.x - p2.x;
+          const djy = p.y - p2.y;
+          const distNodes = Math.sqrt(djx * djx + djy * djy);
+          if (distNodes < 110) {
+            ctx.strokeStyle = pColor;
+            ctx.globalAlpha = (1 - distNodes / 110) * 0.22;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+            ctx.globalAlpha = 1.0;
+          }
+        }
+      }
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    /* 2. 3D TILT EFFECT NO SMARTPHONE (FUNÇÃO 6, 11) */
+    const phone = document.getElementById('phoneMockup');
+    const container = document.querySelector('.phone-container');
+
+    container.addEventListener('mousemove', (e) => {
+      const rect = phone.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      const rotateX = -(y / (rect.height / 2)) * 12;
+      const rotateY = (x / (rect.width / 2)) * 14;
+      phone.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    });
+
+    container.addEventListener('mouseleave', () => {
+      phone.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    });
+
+    /* 3. CONTADORES NUMÉRICOS KINÉTICOS (FUNÇÃO 15) */
+    const counters = document.querySelectorAll('.metric-val');
+    let animatedCounters = false;
+
+    function runCounters() {
+      if (animatedCounters) return;
+      animatedCounters = true;
+      counters.forEach(counter => {
+        const target = +counter.getAttribute('data-target');
+        const duration = 1600;
+        const stepTime = 30;
+        const steps = duration / stepTime;
+        const increment = target / steps;
+        let current = 0;
+
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            counter.innerText = target;
+            clearInterval(timer);
+          } else {
+            counter.innerText = Math.floor(current);
+          }
+        }, stepTime);
+      });
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) runCounters();
+    }, { threshold: 0.3 });
+    observer.observe(document.querySelector('.metrics-row'));
+
+    /* 4. SELETOR DE ESTILO / TEMA DINÂMICO */
+    function setTheme(themeName, btn) {
+      document.body.className = '';
+      if (themeName !== 'default') {
+        document.body.classList.add('theme-' + themeName);
+      }
+      document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    /* 5. LÓGICA DO SIMULADOR MÓVEL */
     const items = [
       { id: 1, name: 'Alface Crespa', cat: 'Hortifrúti', qty: 2, bought: false },
       { id: 2, name: 'Arroz Integral', cat: 'Mercearia', qty: 1, bought: false },
