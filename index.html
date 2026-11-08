@@ -8,21 +8,21 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2310b981%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z%22></path><line x1=%223%22 y1=%226%22 x2=%2221%22 y2=%226%22></line><path d=%22M16 10a4 4 0 0 1-8 0%22></path></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #090a0f;
-      --bg-surface: #0f1118;
-      --bg-card: #13151f;
-      --bg-card-hover: #181b27;
-      --border: #1f2330;
-      --border-subtle: #171a24;
-      --border-accent: #2e3447;
+      --bg-surface: #0e111a;
+      --bg-card: #121520;
+      --bg-card-hover: #171b29;
+      --border: #1e2230;
+      --border-subtle: #161924;
+      --border-accent: #2c3246;
       --primary: #10b981;
       --primary-dim: rgba(16, 185, 129, 0.08);
-      --text: #f4f4f5;
-      --text-muted: #9496a1;
-      --text-dim: #5c6070;
+      --text: #f4f4f6;
+      --text-muted: #9496a3;
+      --text-dim: #5c6072;
       --mono: 'JetBrains Mono', monospace;
       --sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
@@ -42,14 +42,14 @@
       overflow-x: hidden;
     }
 
-    /* NAVEGAÇÃO SUPERIOR */
+    /* NAVEGAÇÃO FROSTED GLASS (APPLE HIG) */
     header.nav {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(9, 10, 15, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(9, 10, 15, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
     }
 
@@ -73,7 +73,7 @@
     .brand-logo {
       width: 28px;
       height: 28px;
-      border-radius: 6px;
+      border-radius: 7px;
       background: var(--primary-dim);
       border: 1px solid rgba(16, 185, 129, 0.25);
       display: flex;
@@ -110,7 +110,7 @@
       text-decoration: none;
       font-size: 0.85rem;
       font-weight: 500;
-      transition: color 0.15s;
+      transition: color 0.15s ease;
     }
 
     .nav-links a:hover {
@@ -132,13 +132,18 @@
       text-decoration: none;
       font-size: 0.82rem;
       font-weight: 600;
-      padding: 0.4rem 0.85rem;
+      padding: 0.45rem 0.9rem;
       border-radius: 6px;
-      transition: opacity 0.15s;
+      transition: opacity 0.15s ease, transform 0.1s ease;
     }
 
     .btn-nav-download:hover {
-      opacity: 0.9;
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .btn-nav-download:active {
+      transform: scale(0.98);
     }
 
     .btn-nav-github {
@@ -151,9 +156,9 @@
       text-decoration: none;
       font-size: 0.82rem;
       font-weight: 500;
-      padding: 0.4rem 0.85rem;
+      padding: 0.45rem 0.9rem;
       border-radius: 6px;
-      transition: border-color 0.15s, background 0.15s;
+      transition: border-color 0.15s ease, background 0.15s ease;
     }
 
     .btn-nav-github:hover {
@@ -165,22 +170,42 @@
     main {
       max-width: 1140px;
       margin: 0 auto;
-      padding: 4rem 1.5rem 6rem;
+      padding: 4.5rem 1.5rem 7rem;
+    }
+
+    /* SISTEMA DE SCROLL REVEAL SUAVE */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
     }
 
     /* HERO SECTION */
     .hero-grid {
       display: grid;
       grid-template-columns: 1.15fr 0.85fr;
-      gap: 4rem;
+      gap: 4.5rem;
       align-items: center;
-      margin-bottom: 5.5rem;
+      margin-bottom: 6rem;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 920px) {
       .hero-grid {
         grid-template-columns: 1fr;
-        gap: 3rem;
+        gap: 3.5rem;
       }
     }
 
@@ -192,9 +217,9 @@
       font-size: 0.72rem;
       color: var(--primary);
       background: var(--primary-dim);
-      border: 1px solid rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.22);
       padding: 0.25rem 0.65rem;
-      border-radius: 4px;
+      border-radius: 5px;
       margin-bottom: 1.5rem;
     }
 
@@ -203,10 +228,11 @@
       height: 6px;
       border-radius: 50%;
       background: var(--primary);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
     }
 
     h1.hero-title {
-      font-size: clamp(2rem, 3.8vw, 2.85rem);
+      font-size: clamp(2.1rem, 4vw, 3rem);
       font-weight: 700;
       line-height: 1.15;
       letter-spacing: -0.03em;
@@ -217,8 +243,8 @@
     .hero-desc {
       font-size: 1.05rem;
       color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 2rem;
+      line-height: 1.65;
+      margin-bottom: 2.25rem;
       max-width: 540px;
     }
 
@@ -238,13 +264,18 @@
       font-weight: 600;
       font-size: 0.9rem;
       padding: 0.75rem 1.4rem;
-      border-radius: 6px;
+      border-radius: 7px;
       text-decoration: none;
-      transition: opacity 0.15s;
+      transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .btn-solid:hover {
-      opacity: 0.9;
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .btn-solid:active {
+      transform: scale(0.98);
     }
 
     .btn-outline {
@@ -257,29 +288,34 @@
       font-weight: 500;
       font-size: 0.9rem;
       padding: 0.75rem 1.3rem;
-      border-radius: 6px;
+      border-radius: 7px;
       text-decoration: none;
-      transition: background 0.15s, border-color 0.15s;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
     }
 
     .btn-outline:hover {
       background: var(--bg-surface);
       border-color: var(--border-accent);
+      transform: translateY(-1px);
     }
 
-    /* MOCKUP DO SMARTPHONE LIMPO */
+    .btn-outline:active {
+      transform: scale(0.98);
+    }
+
+    /* MOCKUP DO SMARTPHONE INTERATIVO (LINEAR/APPLE HIG) */
     .phone-container {
       display: flex;
       justify-content: center;
     }
 
     .phone-frame {
-      width: 310px;
-      height: 600px;
+      width: 316px;
+      height: 610px;
       background: #000;
-      border-radius: 36px;
-      border: 1px solid #2a2e3d;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      border-radius: 38px;
+      border: 1px solid #282d3e;
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65), 0 0 1px rgba(255, 255, 255, 0.15);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -287,7 +323,7 @@
     }
 
     .phone-notch {
-      height: 24px;
+      height: 26px;
       background: #000;
       display: flex;
       justify-content: center;
@@ -295,15 +331,15 @@
     }
 
     .phone-notch-bar {
-      width: 70px;
-      height: 4px;
-      background: #1f2330;
-      border-radius: 2px;
+      width: 68px;
+      height: 4.5px;
+      background: #1c202d;
+      border-radius: 3px;
     }
 
     .phone-header {
       padding: 10px 14px;
-      background: #0e111a;
+      background: #0d1018;
       border-bottom: 1px solid #1a1e2b;
       display: flex;
       align-items: center;
@@ -327,12 +363,13 @@
       color: var(--text-muted);
       width: 26px;
       height: 26px;
-      border-radius: 5px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       font-size: 0.75rem;
+      transition: color 0.15s ease, border-color 0.15s ease;
     }
 
     .phone-btn-icon:hover {
@@ -347,6 +384,12 @@
       padding: 0.35rem 0.8rem;
       border-bottom: 1px solid rgba(245, 158, 11, 0.2);
       display: none;
+      animation: stripSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes stripSlide {
+      from { transform: translateY(-100%); }
+      to { transform: translateY(0); }
     }
 
     .phone-body {
@@ -360,10 +403,10 @@
     }
 
     .phone-progress-card {
-      background: #0e111a;
+      background: #0d1018;
       border: 1px solid #1a1e2b;
-      border-radius: 8px;
-      padding: 10px;
+      border-radius: 10px;
+      padding: 10px 12px;
       margin-bottom: 4px;
     }
 
@@ -372,54 +415,63 @@
       color: var(--text-dim);
       display: flex;
       justify-content: space-between;
-      margin-bottom: 6px;
+      margin-bottom: 7px;
       font-weight: 500;
     }
 
     .phone-bar-bg {
-      height: 4px;
+      height: 4.5px;
       background: #1a1e2b;
-      border-radius: 2px;
+      border-radius: 3px;
       overflow: hidden;
     }
 
     .phone-bar-fill {
       height: 100%;
       background: var(--primary);
-      border-radius: 2px;
-      transition: width 0.3s ease;
+      border-radius: 3px;
+      transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .phone-item {
-      background: #0e111a;
+      background: #0d1018;
       border: 1px solid #1a1e2b;
-      border-radius: 8px;
-      padding: 9px 10px;
+      border-radius: 10px;
+      padding: 9px 11px;
       display: flex;
       align-items: center;
-      gap: 9px;
+      gap: 10px;
       cursor: pointer;
-      transition: border-color 0.15s;
+      user-select: none;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
     }
 
     .phone-item:hover {
+      background: #131724;
       border-color: #2b3145;
+    }
+
+    .phone-item:active {
+      transform: scale(0.985);
     }
 
     .phone-item.done {
       opacity: 0.45;
+      background: #090c13;
     }
 
     .phone-checkbox {
-      width: 17px;
-      height: 17px;
+      width: 18px;
+      height: 18px;
       border: 1px solid #2e3547;
-      border-radius: 4px;
+      border-radius: 5px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 0.65rem;
-      color: #fff;
+      color: #000;
+      font-weight: 700;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .phone-item.done .phone-checkbox {
@@ -436,6 +488,7 @@
       font-size: 0.8rem;
       font-weight: 500;
       color: #f4f4f5;
+      transition: color 0.15s ease;
     }
 
     .phone-item.done .phone-item-name {
@@ -455,16 +508,61 @@
       right: 14px;
       width: 40px;
       height: 40px;
-      border-radius: 8px;
+      border-radius: 10px;
       background: #fff;
       color: #000;
       border: none;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background 0.15s ease;
+    }
+
+    .phone-fab:hover {
+      transform: scale(1.06);
+      background: #f1f5f9;
+    }
+
+    .phone-fab:active {
+      transform: scale(0.95);
+    }
+
+    /* CARD COM BORDER SPOTLIGHT (LINEAR/VERCEL PATTERN) */
+    .spotlight-card {
+      position: relative;
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .spotlight-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: radial-gradient(380px circle at var(--mouse-x, -500px) var(--mouse-y, -500px), rgba(255, 255, 255, 0.14), transparent 70%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .spotlight-card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+
+    .spotlight-card:hover::before {
+      opacity: 1;
     }
 
     /* SEÇÃO BENTO: ARQUITETURA */
@@ -482,17 +580,17 @@
     }
 
     .section-title {
-      font-size: 1.75rem;
+      font-size: 1.8rem;
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
       color: #fff;
     }
 
     .bento-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin-bottom: 5rem;
+      gap: 1.25rem;
+      margin-bottom: 5.5rem;
     }
 
     @media (max-width: 900px) {
@@ -508,25 +606,18 @@
     }
 
     .bento-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.5rem;
+      padding: 1.6rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: border-color 0.15s;
-    }
-
-    .bento-card:hover {
-      border-color: var(--border-accent);
     }
 
     .bento-num {
       font-family: var(--mono);
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--text-dim);
       margin-bottom: 0.75rem;
+      letter-spacing: 0.05em;
     }
 
     .bento-title {
@@ -534,12 +625,13 @@
       font-weight: 600;
       color: #fff;
       margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
     }
 
     .bento-desc {
       font-size: 0.85rem;
       color: var(--text-muted);
-      line-height: 1.5;
+      line-height: 1.55;
       margin-bottom: 1.25rem;
     }
 
@@ -564,7 +656,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1.5rem;
-      margin-bottom: 5rem;
+      margin-bottom: 5.5rem;
     }
 
     @media (max-width: 800px) {
@@ -574,29 +666,28 @@
     }
 
     .panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.75rem;
+      padding: 1.85rem;
     }
 
     .panel-title {
       font-size: 1.15rem;
       font-weight: 600;
       color: #fff;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
     }
 
     .panel-desc {
       font-size: 0.88rem;
       color: var(--text-muted);
-      margin-bottom: 1rem;
+      margin-bottom: 1.15rem;
+      line-height: 1.55;
     }
 
     .code-container {
       background: #06070a;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 1rem;
       font-family: var(--mono);
       font-size: 0.8rem;
@@ -615,7 +706,7 @@
 
     .test-table th {
       text-align: left;
-      padding: 0.6rem 0.75rem;
+      padding: 0.65rem 0.75rem;
       border-bottom: 1px solid var(--border);
       color: var(--text-dim);
       font-weight: 600;
@@ -623,7 +714,7 @@
     }
 
     .test-table td {
-      padding: 0.65rem 0.75rem;
+      padding: 0.7rem 0.75rem;
       border-bottom: 1px solid var(--border-subtle);
       color: var(--text-muted);
     }
@@ -638,14 +729,14 @@
     .author-box {
       border: 1px solid var(--border);
       background: var(--bg-surface);
-      border-radius: 8px;
-      padding: 2rem;
+      border-radius: 12px;
+      padding: 2.25rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 1.5rem;
-      margin-top: 4rem;
+      margin-top: 4.5rem;
     }
 
     .author-box h3 {
@@ -653,6 +744,7 @@
       font-weight: 700;
       color: #fff;
       margin-bottom: 0.25rem;
+      letter-spacing: -0.01em;
     }
 
     .author-box p {
@@ -706,7 +798,7 @@
 
   <main>
     <!-- HERO SECTION -->
-    <section class="hero-grid">
+    <section class="hero-grid reveal">
       <div>
         <div class="badge-meta">
           <span class="badge-dot"></span>
@@ -717,7 +809,7 @@
 
         <p class="hero-desc">
           Implementação do tutorial da Aula 15 de Desenvolvimento para Dispositivos Móveis no IFB Campus Brasília.
-          Construído com Flutter, Riverpod, banco de dados SQLite local com restrições relacionais, e sincronização resiliente com Exponential Backoff e Full Jitter.
+          Construído com Flutter, Riverpod, banco relacional SQLite local com restrições e concorrência otimista, e sincronização resiliente com Exponential Backoff e Full Jitter.
         </p>
 
         <div class="hero-buttons">
@@ -730,7 +822,7 @@
         </div>
       </div>
 
-      <!-- MOCKUP DO DISPOSITIVO MÓVEL -->
+      <!-- MOCKUP DO DISPOSITIVO MÓVEL COM INTERAÇÃO SUAVE -->
       <div class="phone-container">
         <div class="phone-frame">
           <div class="phone-notch">
@@ -769,14 +861,14 @@
     </section>
 
     <!-- ARQUITETURA EM CAMADAS -->
-    <section id="arquitetura">
+    <section id="arquitetura" class="reveal">
       <div class="section-header">
         <div class="section-eyebrow">Engenharia de Software</div>
         <h2 class="section-title">Separação de Responsabilidades em Quatro Camadas</h2>
       </div>
 
       <div class="bento-grid">
-        <div class="bento-card">
+        <div class="bento-card spotlight-card">
           <div>
             <div class="bento-num">01 / APRESENTAÇÃO</div>
             <h3 class="bento-title">Interface & Estado</h3>
@@ -788,7 +880,7 @@
           </div>
         </div>
 
-        <div class="bento-card">
+        <div class="bento-card spotlight-card">
           <div>
             <div class="bento-num">02 / DOMÍNIO</div>
             <h3 class="bento-title">Regras Puras</h3>
@@ -800,7 +892,7 @@
           </div>
         </div>
 
-        <div class="bento-card">
+        <div class="bento-card spotlight-card">
           <div>
             <div class="bento-num">03 / DADOS</div>
             <h3 class="bento-title">SQLite Local</h3>
@@ -812,7 +904,7 @@
           </div>
         </div>
 
-        <div class="bento-card">
+        <div class="bento-card spotlight-card">
           <div>
             <div class="bento-num">04 / PLATAFORMA</div>
             <h3 class="bento-title">Nativo & Sincronização</h3>
@@ -827,8 +919,8 @@
     </section>
 
     <!-- BANCO E TESTES -->
-    <section class="grid-two" id="sqlite">
-      <div class="panel">
+    <section class="grid-two reveal" id="sqlite">
+      <div class="panel spotlight-card">
         <h3 class="panel-title">Esquema Relacional SQLite</h3>
         <p class="panel-desc">Tabela canônica com restrições de integridade, chaves tipadas e índice composto.</p>
         <div class="code-container">
@@ -849,7 +941,7 @@ ON itens_compra (comprado, nome);
         </div>
       </div>
 
-      <div class="panel" id="testes">
+      <div class="panel spotlight-card" id="testes">
         <h3 class="panel-title">Suíte de Testes Automatizados</h3>
         <p class="panel-desc">Testes executados com sucesso em ambiente FFI isolado e esteira GitHub Actions.</p>
         <table class="test-table">
@@ -887,7 +979,7 @@ ON itens_compra (comprado, nome);
     </section>
 
     <!-- DOWNLOAD E INSTALAÇÃO -->
-    <section class="panel" id="download" style="margin-bottom: 5rem;">
+    <section class="panel spotlight-card reveal" id="download" style="margin-bottom: 5.5rem;">
       <h3 class="panel-title">Distribuição e Verificação do Binário APK</h3>
       <p class="panel-desc">
         O APK Release oficial foi gerado e assinado via CI/CD no GitHub Actions, compatível com Android 7.0+ (API 24 até API 36).
@@ -910,7 +1002,7 @@ adb shell am start -W -a android.intent.action.VIEW -d "compras://app/item/1" br
     </section>
 
     <!-- CARTÃO DO AUTOR -->
-    <div class="author-box">
+    <div class="author-box spotlight-card reveal">
       <div>
         <p style="font-family: var(--mono); font-size: 0.72rem; color: var(--primary); text-transform: uppercase; margin-bottom: 0.25rem;">Autoria Acadêmica</p>
         <h3>Felipe Madison da Silva Veloso</h3>
@@ -928,6 +1020,32 @@ adb shell am start -W -a android.intent.action.VIEW -d "compras://app/item/1" br
   </footer>
 
   <script>
+    /* BORDER SPOTLIGHT INTERACTION (LINEAR/VERCEL PATTERN) */
+    const spotlightCards = document.querySelectorAll('.spotlight-card');
+    spotlightCards.forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+    });
+
+    /* SCROLL REVEAL OBSERVER */
+    const reveals = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    reveals.forEach(el => revealObserver.observe(el));
+
+    /* SIMULADOR MÓVEL FLUIDO */
     const items = [
       { id: 1, name: 'Alface Crespa', cat: 'Hortifrúti', qty: 2, bought: false },
       { id: 2, name: 'Arroz Integral', cat: 'Mercearia', qty: 1, bought: false },
