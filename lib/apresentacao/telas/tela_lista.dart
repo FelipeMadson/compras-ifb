@@ -186,10 +186,17 @@ class _CabecalhoResumo extends StatelessWidget {
               const SizedBox(height: 10),
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: resumo.progresso,
-                  minHeight: 6,
-                  backgroundColor: cores.surfaceContainerHighest,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0, end: resumo.progresso),
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, valor, _) {
+                    return LinearProgressIndicator(
+                      value: valor,
+                      minHeight: 6,
+                      backgroundColor: cores.surfaceContainerHighest,
+                    );
+                  },
                 ),
               ),
               if (resumo.aguardandoEnvio > 0) ...[
