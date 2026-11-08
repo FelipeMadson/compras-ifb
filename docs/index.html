@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Compras IFB — Aplicativo Móvel com SQLite e Arquitetura em Camadas</title>
+  <meta name="description" content="Projeto prático desenvolvido para a disciplina de Desenvolvimento para Dispositivos Móveis (DPDMV 2026/2) no IFB Campus Brasília. Flutter, Riverpod, SQLite e canal nativo Kotlin.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --bg-card: #111827;
+      --bg-card-subtle: #172033;
+      --border: #1f293d;
+      --border-focus: #0d9488;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #14b8a6;
+      --primary-hover: #0d9488;
+      --primary-dim: rgba(20, 184, 166, 0.12);
+      --accent: #38bdf8;
+      --success: #22c55e;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header.nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+      background: rgba(11, 15, 23, 0.82);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .brand-tag {
+      background: var(--primary-dim);
+      color: var(--primary);
+      border: 1px solid rgba(20, 184, 166, 0.25);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .btn-github {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.45rem 0.9rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-github:hover {
+      border-color: var(--border-focus);
+      background: var(--bg-card-subtle);
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    .hero {
+      padding: 3rem 0 4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-weight: 600;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .badge.active {
+      background: rgba(34, 197, 94, 0.1);
+      border-color: rgba(34, 197, 94, 0.3);
+      color: var(--success);
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+      color: #ffffff;
+    }
+
+    .hero-lead {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 780px;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: var(--primary);
+      color: #042f2e;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--border-focus);
+      background: var(--bg-card-subtle);
+    }
+
+    section {
+      padding: 4rem 0 2rem;
+    }
+
+    .section-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--border-focus);
+    }
+
+    .card-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-body {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .card ul {
+      margin-top: 1rem;
+      padding-left: 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .card ul li {
+      margin-bottom: 0.4rem;
+    }
+
+    .code-block {
+      background: #06090e;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: var(--mono);
+      font-size: 0.84rem;
+      overflow-x: auto;
+      margin-top: 1.5rem;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-top: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+
+    th {
+      background: var(--bg-card-subtle);
+      padding: 0.85rem 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .profile-card {
+      background: linear-gradient(145deg, #111827 0%, #0d131f 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .profile-info h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    .profile-info p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+      }
+      .hero {
+        padding: 1.5rem 0 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <span>Compras IFB</span>
+        <span class="brand-tag">DPDMV 2026/2</span>
+      </a>
+      <div class="nav-links">
+        <a href="#arquitetura">Arquitetura</a>
+        <a href="#sqlite">Banco SQLite</a>
+        <a href="#testes">Testes</a>
+        <a href="#instalacao">Como Instalar</a>
+      </div>
+      <a href="https://github.com/FelipeMadson/compras-ifb" class="btn-github" target="_blank" rel="noopener">
+        <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        <span>Repositório</span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-meta">
+        <span class="badge active">● Avaliação 1 Concluída</span>
+        <span class="badge">IFB Campus Brasília</span>
+        <span class="badge">Sistemas para Internet</span>
+      </div>
+      <h1>Lista de Compras Móvel com SQLite e Arquitetura em Camadas</h1>
+      <p class="hero-lead">
+        Implementação integral e resiliente do tutorial da Aula 15 da disciplina de Desenvolvimento para Dispositivos Móveis.
+        Engenharia orientada a <em>offline-first</em>, separação estrita de responsabilidades, inversão de controle via Riverpod e canal de plataforma nativo em Kotlin.
+      </p>
+      <div class="hero-actions">
+        <a href="https://github.com/FelipeMadson/compras-ifb" class="btn-primary" target="_blank" rel="noopener">
+          Ver Código no GitHub
+        </a>
+        <a href="https://github.com/FelipeMadson/compras-ifb/releases/latest" class="btn-secondary" target="_blank" rel="noopener">
+          Baixar APK (Release)
+        </a>
+      </div>
+    </section>
+
+    <section id="arquitetura">
+      <div class="section-header">
+        <div class="section-eyebrow">Engenharia de Software</div>
+        <h2 class="section-title">Arquitetura em Camadas Desacoplada</h2>
+      </div>
+
+      <div class="arch-grid">
+        <div class="card">
+          <div class="card-label">Camada 01</div>
+          <h3 class="card-title">Domínio Puro</h3>
+          <p class="card-body">
+            Isolamento de qualquer biblioteca de interface ou banco. Entidades imutáveis com <code>copyWith</code> e regras de validação puras testadas com Dart puro.
+          </p>
+          <ul>
+            <li><strong>Item:</strong> Entidade imutável com rastreio de sincronização.</li>
+            <li><strong>ItemRepository:</strong> Contrato abstrato (DIP).</li>
+            <li><strong>Regras:</strong> Validação de tamanho [2, 40] e restrição [1, 99].</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Camada 02</div>
+          <h3 class="card-title">Dados e Persistência</h3>
+          <p class="card-body">
+            SQLite relacional no aparelho, mapeador de registros e concorrência otimista com validação por timestamp.
+          </p>
+          <ul>
+            <li><strong>BancoDeDados:</strong> Abertura singleton e metadados.</li>
+            <li><strong>Concorrência:</strong> Bloqueio otimista via <code>atualizado_em</code>.</li>
+            <li><strong>Resiliência:</strong> Backoff exponencial com full jitter.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Camada 03</div>
+          <h3 class="card-title">Apresentação & Estado</h3>
+          <p class="card-body">
+            Composition Root centralizado com Riverpod. Gerenciamento de ciclo de vida assíncrono via <code>AsyncValue</code> e roteamento com <code>GoRouter</code>.
+          </p>
+          <ul>
+            <li><strong>Providers:</strong> Injeção sem geração de código.</li>
+            <li><strong>Deep Linking:</strong> Esquema <code>compras://app/item/:id</code>.</li>
+            <li><strong>Acessibilidade:</strong> WCAG, Semantics e Breakpoints M3.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="sqlite">
+      <div class="section-header">
+        <div class="section-eyebrow">Camada Relacional</div>
+        <h2 class="section-title">Esquema do Banco SQLite e Concorrência</h2>
+      </div>
+
+      <p style="color: var(--text-muted); max-width: 800px; margin-bottom: 1.5rem;">
+        Em substituição ao <code>shared_preferences</code>, a tabela relacional assegura atomicidade de transações, consultas indexadas por registros pendentes e restrição no motor via <code>CHECK</code> como defesa em profundidade.
+      </p>
+
+      <div class="code-block">
+CREATE TABLE itens (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome          TEXT    NOT NULL,
+  quantidade    INTEGER NOT NULL CHECK (quantidade BETWEEN 1 AND 99),
+  categoria     TEXT    NOT NULL,
+  observacao    TEXT    NOT NULL DEFAULT '',
+  comprado      INTEGER NOT NULL DEFAULT 0,
+  sincronizado  INTEGER NOT NULL DEFAULT 0,
+  criado_em     INTEGER NOT NULL,
+  atualizado_em INTEGER NOT NULL
+);
+
+CREATE INDEX idx_itens_sincronizado ON itens (sincronizado);
+      </div>
+    </section>
+
+    <section id="testes">
+      <div class="section-header">
+        <div class="section-eyebrow">Confiabilidade</div>
+        <h2 class="section-title">Cobertura de Testes Automatizados</h2>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nível</th>
+              <th>Arquivo de Teste</th>
+              <th>Alvo de Verificação</th>
+              <th>Dependência</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Unidade</strong></td>
+              <td><code>regras_item_test.dart</code></td>
+              <td>Validações de nome, cardinalidade, ordenação e resumo</td>
+              <td>Dart Puro</td>
+            </tr>
+            <tr>
+              <td><strong>Unidade</strong></td>
+              <td><code>nova_tentativa_test.dart</code></td>
+              <td>Backoff exponencial com jitter e filtro de falhas</td>
+              <td>Dart Puro</td>
+            </tr>
+            <tr>
+              <td><strong>Integração</strong></td>
+              <td><code>item_repository_sqlite_test.dart</code></td>
+              <td>SQL real: inserção, leitura, exclusão e concorrência otimista</td>
+              <td>SQLite FFI em memória</td>
+            </tr>
+            <tr>
+              <td><strong>Interface</strong></td>
+              <td><code>fluxo_da_lista_test.dart</code></td>
+              <td>Navegação, validação de formulário e persistência mockada</td>
+              <td>Widget Tester</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="instalacao">
+      <div class="section-header">
+        <div class="section-eyebrow">Distribuição</div>
+        <h2 class="section-title">Instalação e Teste no Android</h2>
+      </div>
+
+      <div class="code-block">
+# 1. Compilação do APK de Produção (Universal)
+flutter build apk --release
+
+# 2. Instalação Direta via ADB no Aparelho ou Emulador
+adb install -r build/app/outputs/flutter-apk/app-release.apk
+
+# 3. Teste de Abertura por Ligação Profunda (Deep Link)
+adb shell am start -W -a android.intent.action.VIEW -d "compras://app/item/1" br.edu.ifb.felipemadison.compras
+      </div>
+    </section>
+
+    <section>
+      <div class="profile-card">
+        <div class="profile-info">
+          <div class="section-eyebrow" style="color: var(--primary);">Autoria Acadêmica</div>
+          <h3>Felipe Madison da Silva Veloso</h3>
+          <p>Matrícula Institucional: <strong>69815</strong> • Curso Superior de Tecnologia em Sistemas para Internet</p>
+          <p>Instituto Federal de Educação, Ciência e Tecnologia de Brasília (IFB) — Campus Brasília</p>
+        </div>
+        <div>
+          <a href="https://github.com/FelipeMadson" class="btn-secondary" target="_blank" rel="noopener">Perfil GitHub</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Projeto acadêmico desenvolvido para a disciplina DPDMV 2026/2 • IFB Campus Brasília • Docente: Cláudio Ulhoa</p>
+  </footer>
+
+</body>
+</html>
