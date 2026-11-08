@@ -397,8 +397,6 @@ class _TelaSobreState extends ConsumerState<TelaSobre> {
     );
   }
 }
-  }
-}
 
 class _ItemInfo extends StatelessWidget {
   const _ItemInfo({

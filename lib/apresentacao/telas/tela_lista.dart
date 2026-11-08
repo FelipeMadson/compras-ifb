@@ -94,7 +94,7 @@ class TelaLista extends ConsumerWidget {
 }
 
 class _Conteudo extends ConsumerWidget {
-  const _Conteudo({super.key, required this.itens});
+  const _Conteudo({required this.itens});
 
   final List<Item> itens;
 
