@@ -626,11 +626,14 @@
           Engenharia focada em <em>offline-first</em>, banco relacional SQLite local, inversão de controle via Riverpod e canal nativo de plataforma em Kotlin.
         </p>
         <div class="hero-btns">
-          <a href="https://github.com/FelipeMadson/compras-ifb" class="btn-primary" target="_blank" rel="noopener">
+          <a href="https://github.com/FelipeMadson/compras-ifb/releases/download/v1.0.0/app-release.apk" class="btn-primary" target="_blank" rel="noopener">
+            ⬇️ Baixar APK Release (v1.0.0)
+          </a>
+          <a href="https://github.com/FelipeMadson/compras-ifb" class="btn-secondary" target="_blank" rel="noopener">
             Repositório no GitHub
           </a>
-          <a href="https://github.com/FelipeMadson/compras-ifb/actions" class="btn-secondary" target="_blank" rel="noopener">
-            Esteira de CI/CD (Testes & Build)
+          <a href="https://github.com/FelipeMadson/compras-ifb/releases/tag/v1.0.0" class="btn-secondary" target="_blank" rel="noopener">
+            Release Oficial
           </a>
         </div>
       </div>
@@ -774,6 +777,17 @@ CREATE INDEX idx_itens_sincronizado ON itens (sincronizado);
     <section id="download">
       <div class="section-eyebrow">Distribuição Oficial</div>
       <h2 class="section-title">Como Baixar e Instalar o APK</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        O pacote binário oficial do aplicativo foi compilado com sucesso via esteira de CI/CD (GitHub Actions) e assinado para distribuição direta em dispositivos Android (Android 7.0+ / API 24 até API 36).
+      </p>
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+        <a href="https://github.com/FelipeMadson/compras-ifb/releases/download/v1.0.0/app-release.apk" class="btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+          ⬇️ Baixar app-release.apk (53 MB)
+        </a>
+        <a href="https://github.com/FelipeMadson/compras-ifb/releases/tag/v1.0.0" class="btn-secondary" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+          🏷️ Notas da Release v1.0.0
+        </a>
+      </div>
       <div class="code-box">
 # Instalação direta no aparelho ou emulador via terminal:
 adb install -r app-release.apk
