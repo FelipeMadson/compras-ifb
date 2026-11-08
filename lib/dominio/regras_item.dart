@@ -63,6 +63,9 @@ class Resumo {
 
   /// Razão matemática entre itens concluídos e o montante global cadastrado.
   double get progresso => total == 0 ? 0.0 : comprados / total;
+
+  /// Indica se todos os itens cadastrados foram marcados como adquiridos.
+  bool get concluido => total > 0 && comprados == total;
 }
 
 /// Computa métricas consolidadas sobre uma coleção de itens.

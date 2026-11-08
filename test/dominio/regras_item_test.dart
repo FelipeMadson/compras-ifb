@@ -78,5 +78,12 @@ void main() {
     expect(resumo.comprados, 1);
     expect(resumo.aguardandoEnvio, 1);
     expect(resumo.progresso, closeTo(1 / 3, 0.001));
+    expect(resumo.concluido, isFalse);
+
+    final concluido = resumir([
+      _item('A', 'Mercearia', comprado: true),
+      _item('B', 'Mercearia', comprado: true),
+    ]);
+    expect(concluido.concluido, isTrue);
   });
 }

@@ -41,7 +41,7 @@ class AppCompras extends ConsumerWidget {
         iconTheme: IconThemeData(color: Color(0xFFF4F4F6)),
         systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         color: const Color(0xFF121622),
         shape: RoundedRectangleBorder(
@@ -139,7 +139,7 @@ class AppCompras extends ConsumerWidget {
         iconTheme: IconThemeData(color: Color(0xFF0F172A)),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         color: const Color(0xFFFFFFFF),
         shape: RoundedRectangleBorder(
